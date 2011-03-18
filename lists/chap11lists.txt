@@ -1,0 +1,248 @@
+第11章のリスト
+===============================================================================
+
+★［リスト11-1］――svn:externalsにsymfonyの1.4ブランチのtrunkを設定★
+▽●●●●
+symfony http://svn.symfony-project.com/branches/1.4/
+△●●●●
+
+
+★［リスト11-2］――.gitignore★
+▽●●●●
+cache/
+log/
+△●●●●
+
+
+★［リスト11-3］――テスト用のデータベース接続設定を追加★
+▽●●●●
+test:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn:      mysql:host=localhost;dbname=symfonybandtest
+      username: root
+      password:
+all:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn:      mysql:host=localhost;dbname=symfonyband
+      username: root
+      password:
+△●●●●
+
+
+★［リスト11-4］――Pageモデルのユニットテスト（PageTest.php）★
+▽●●●●
+<?php
+include dirname(__FILE__).'/../../../bootstrap/unit.php';          // (1)
+new sfDatabaseManager($configuration);
+Doctrine_Core::loadData(sfConfig::get('sf_data_dir').'/fixtures'); // (2)
+$test = new lime_test(5);
+
+newsCountCheck($test, 5);                                          // (3)
+
+$title = 'Lime Test Title';
+$body  = 'Lime Test Body';
+
+$page = new Page();
+$page->setTitle($title);
+$page->setBody($body);
+$page->setCategory('news');
+$page->save();
+
+$testPages = PageTable::getInstance()->createQuery('p')
+  ->where('p.title = ?', $title)
+  ->execute();
+
+if(count($testPages) === 1)                                        // (4)
+{
+  $test->is($testPages[0]->getTitle(), $title, 'Titleの保存取得は正常');
+  $test->is($testPages[0]->getBody(),  $body,  'Bodyの保存取得は正常');
+}
+else
+{
+  $test->fail('Page count error.');
+}
+
+newsCountCheck($test, 6);
+
+$page->delete();                                                   // (5)
+
+newsCountCheck($test, 5);
+
+function newsCountCheck($test, $num)
+{
+  $news = PageTable::queryLatestNews()->count();
+  $test->is($num, $news, 'newsカテゴリの件数は' . $news . '件');
+}
+△●●●●
+
+
+★［リスト11-5］――Pageモデルのユニットテストを修正★
+▽●●●●
+<?php
+include dirname(__FILE__).'/../../../bootstrap/unit.php';
+new sfDatabaseManager($configuration);
+Doctrine_Core::loadData(sfConfig::get('sf_data_dir').'/fixtures');
+$test = new lime_test(6);
+
+newsCountCheck($test, 5);
+
+$title  = 'Lime Test Title';
+$body   = 'Lime Test Body';
+$author = '団長';
+
+$page = new Page();
+$page->setTitle($title);
+$page->setBody($body);
+$page->setCategory('news');
+$page->setAuthor($author);
+$page->save();
+
+$testPages = PageTable::getInstance()->createQuery('p')
+  ->where('p.title = ?', $title)
+  ->execute();
+
+if(count($testPages) === 1)
+{
+  $test->is($testPages[0]->getTitle(),  $title,  'Titleの保存取得は正常');
+  $test->is($testPages[0]->getBody(),   $body,   'Bodyの保存取得は正常');
+  $test->is($testPages[0]->getAuthor(), $author, 'Authorの保存取得は正常');
+}
+else
+{
+  $test->fail('Page count error.');
+}
+
+newsCountCheck($test, 6);
+
+$page->delete();
+
+newsCountCheck($test, 5);
+
+function newsCountCheck($test, $num)
+{
+  $news = PageTable::queryLatestNews()->count();
+  $test->is($num, $news, 'newsカテゴリの件数は' . $news . '件');
+}
+△●●●●
+
+
+★［リスト11-6］――schema.ymlのPageモデルにauthorカラムを追加★
+▽●●●●
+Page:
+  actAs:
+    Timestampable: ~
+    Sluggable: ~
+  columns:
+    （省略）
+    author:
+      type:    string(30)
+      notnull: true
+      default: ''
+△●●●●
+
+
+★［リスト11-7］――fixtures.ymlのページデータにauthorカラムの情報を追加（ここではaboutページ）★
+▽●●●●
+Page:
+  TopPage:
+    title:       トップページ
+    slug:        top
+    category:    ~
+    body:        トップページのコンテンツです。
+  AboutPage:
+    title:       Symfony楽団について
+    slug:        about
+    category:    ~
+    body:        Symfony楽団の紹介ページです。
+    author:      Symfony楽団長
+△●●●●
+
+
+★［リスト11-8］――Pageモジュール用の機能テスト★
+▽●●●●
+<?php
+include(dirname(__FILE__).'/../../bootstrap/functional.php');
+$browser = new sfTestFunctional(new sfBrowser());
+
+$browser->
+  get('/page/about')->
+
+  with('request')->begin()->
+    isParameter('module', 'Page')->    // (1)
+    isParameter('action', 'Show')->    // (2)
+  end()->
+  with('response')->begin()->
+    isStatusCode(200)->                // (3)
+    isHeader('content-type', 'text/html; charset=utf-8')-> // (4)
+    checkElement('h2', 'Symfony楽団について')->            // (5)
+  end()
+;
+▲●●●●
+
+
+★［リスト11-9］――著者名が表示されていることをテストする★
+▽●●●●
+<?php
+include(dirname(__FILE__).'/../../bootstrap/functional.php');
+$browser = new sfTestFunctional(new sfBrowser());
+
+$browser->
+  get('/page/about')->
+
+  with('request')->begin()->
+    isParameter('module', 'Page')->
+    isParameter('action', 'Show')->
+  end()->
+  with('response')->begin()->
+    isStatusCode(200)->
+    isHeader('content-type', 'text/html; charset=utf-8')->
+    checkElement('h2', 'Symfony楽団について')->
+    checkElement('#author', 'Symfony楽団長')->             // (6)
+  end()
+;
+▲●●●●
+
+
+★［リスト11-10］――PageモジュールのShowSuccess.phpテンプレートに著者名の表示を追加★
+▽●●●●
+<div id="content">
+  <h2><?php echo $page->getTitle() ?></h2>
+  <p><?php echo nl2br($page->getRawValue()->getBody()) ?></p>
+  <div id="author"><?php echo $page->getAuthor() ?></div>
+</div>
+▲●●●●
+
+
+★［リスト11-11］――デプロイ用のproperties.iniファイル★
+▽●●●●
+[production]
+  host=192.168.0.15
+  port=22
+  user=youraccout
+  dir=/var/www/html
+  type=rsync
+△●●●●
+
+
+★［リスト11-12］――デフォルトのdeploy.rb★
+▽●●●●
+set :application, "set your application name here"
+set :domain,      "#{application}.com"
+set :deploy_to,   "/var/www/#{domain}"
+
+set :repository,  "#{domain}:/var/repos/#{application}.git"
+set :scm,         :git
+# Or: `accurev`, `bzr`, `cvs`, `darcs`, `subversion`, `mercurial`, `perforce`, `subversion` or `none`
+
+role :web,        domain                         # Your HTTP server, Apache/etc
+role :app,        domain                         # This may be the same as your `Web` server
+role :db,         domain, :primary => true       # This is where Rails migrations will run
+
+set  :keep_releases,  3
+△●●●●
+
+

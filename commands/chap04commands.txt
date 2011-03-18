@@ -1,0 +1,52 @@
+第4章のコマンド
+===============================================================================
+
+★P111
+php symfony generate:module frontend Hello
+
+
+★P126
+php symfony doctrine:build-db
+php symfony doctrine:build-model
+php symfony doctrine:build-forms
+php symfony doctrine:build-filters
+php symfony doctrine:build-sql
+php symfony doctrine:insert-sql
+
+
+php symfony doctrine:build --all
+
+
+★P130
+php symfony doctrine:data-load
+
+
+php symfony doctrine:data-load
+
+
+★P131
+select id, title, created_at from page;
+
+
+★P132
+php symfony generate:module frontend Page
+php symfony generate:module frontend Inquiry
+
+
+★P174
+php symfony generate:app backend
+php symfony cc
+
+
+★P175
+ln -s ../../lib/vendor/symfony/data/web/sf .
+ln -s ../../lib/vendor/symfony/lib/plugins/sfDoctrinePlugin/web sfDoctrinePlugin
+
+
+php symfony doctrine:generate-admin backend Page
+
+
+★P179
+htpasswd -c /var/www/symfony-band-etc/.htpasswd admin # adminは管理用ユーザー名
+
+

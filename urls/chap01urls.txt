@@ -1,0 +1,98 @@
+第1章のURL
+===============================================================================
+
+★P3
+symfony 公式サイト　http://www.symfony-project.org/
+
+
+★P5
+tgzアーカイブ http://www.symfony-project.org/installation
+Subversion http://trac.symfony-project.org/browser/branches/1.0
+
+tgzアーカイブ http://www.symfony-project.org/installation
+Subversion http://trac.symfony-project.org/browser/branches/1.1
+
+tgzアーカイブ http://www.symfony-project.org/installation
+Subversion http://trac.symfony-project.org/browser/branches/1.2
+
+
+★P6
+tgz アーカイブ http://www.symfony-project.org/installation
+Subversion http://trac.symfony-project.org/browser/branches/1.3
+
+tgz アーカイブ http://www.symfony-project.org/installation
+Subversion http://trac.symfony-project.org/browser/branches/1.4
+
+tgz アーカイブ http://symfony-reloaded.org/code
+GitHub http://github.com/symfony/symfony
+
+
+★P7
+Wikipedia - Model View Controller
+http://ja.wikipedia.org/wiki/Model_View_Controller
+
+
+★P9
+Wikipedia - Don't repeat yourself
+http://ja.wikipedia.org/wiki/Don't_repeat_yourself
+
+
+★P10
+Wikipedia - xUnit
+http://ja.wikipedia.org/wiki/XUnit
+
+
+★P14
+日本Symfonyユーザー会
+http://www.symfony.gr.jp/
+
+
+★P15
+日本Symfony ユーザー会メーリングリスト
+http://groups.google.com/group/symfony-users-ja
+
+
+★P16
+http://www.symfony-project.org/donate
+
+
+★P32
+The symfony Reference Book - タスク
+http://www.symfony-project.org/reference/1_4/ja/16-Tasks
+
+
+★P36
+The symfony Reference Book「YAMLフォーマット」
+http://www.symfony-project.org/reference/1_4/ja/02-YAML
+
+
+★P37
+設定に関する公式ドキュメント
+http://www.symfony-project.org/reference/1_4/ja/
+
+
+★P39
+Doctrine 1.2	http://www.doctrine-project.org/projects/orm/1.2/docs/manual/ja
+Propel 1.4	http://www.propelorm.org/wiki/Documentation/1.4
+
+
+★P45
+symfony のコーディング規約
+http://trac.symfony-project.org/wiki/HowToContributeToSymfony#CodingStandards
+
+
+★P51
+Zend Framework PHP 標準コーディング規約
+http://framework.zend.com/manual/ja/coding-standard.html
+
+OpenPNE3 コーディング規約
+http://www.openpne.jp/coding-standards-ja/
+
+Sun の日本語スタイルガイド
+http://wikis.sun.com/display/g11nhome/Language+Style+Guides
+
+
+★P52
+SunGlos
+https://g11nportal.sun.com/sungloss/
+

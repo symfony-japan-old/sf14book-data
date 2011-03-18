@@ -1,0 +1,343 @@
+第9章のリスト
+===============================================================================
+
+★［リスト9-1］――デフォルトのautoload.yml★
+▽●●●●
+autoload:
+  # project
+  project:
+    name:           project
+    path:           %SF_LIB_DIR%
+    recursive:      true
+    exclude:        [model, symfony, vendor]
+
+  project_model:
+    name:           project model
+    path:           %SF_LIB_DIR%/model
+    recursive:      true
+
+  # application
+  application:
+    name:           application
+    path:           %SF_APP_LIB_DIR%
+    recursive:      true
+
+  modules:
+    name:           module
+    path:           %SF_APP_DIR%/modules/*/lib
+    prefix:         1
+    recursive:      true
+△●●●●
+
+
+★［リスト9-2］――YAML形式のファイルを読み込む★
+▽●●●●
+$yaml = sfYaml::load('/path/to/config.yml');
+var_dump($yaml);
+△●●●●
+
+
+★［リスト9-3］――連想配列をYAML形式で書き出す★
+▽●●●●
+$data = array('foo'=>
+  array(
+    'bar1'=>1,
+    'bar2'=>2,
+  ));
+$yamlString = sfYaml::dump($data);                      // YAML形式の文字列に変換
+file_put_contents('/path/to/config.yml', $yamlString);  // ファイルに保存
+△●●●●
+
+
+★［リスト9-4］――sfConfigへの設定の読み書き★
+▽●●●●
+    // 設定を保存
+    sfConfig::set('test_config', 'テストの値');
+
+    // 設定を読み込む
+    $value = sfConfig::get('test_config');
+△●●●●
+
+
+★［リスト9-5］――sfFinderの使い方★
+▽●●●●
+$finder = new sfFinder();
+$files  = $finder->name('*.html')
+  ->in('/path/to/lib');
+foreach ($files as $file)
+{
+  // 各ファイルの処理
+}
+△●●●●
+
+
+★［リスト9-6］――sfToolkit::arrayDeepMerge()の使い方★
+▽●●●●
+  $array1 = array(
+    'foo' => array(
+      'bar1'=>'bar1data',
+      'bar2'=>'bar2data',
+    ),
+    'baz' => 'bazdata'
+  );
+  $array2 = array(
+    'foo' => array(
+      'bar1'=>'bar1data',
+      'bar3'=>'bar3data',
+    ),
+    'baz2' => 'baz2data'
+  );
+
+  $merge = array_merge($array1, $array2);
+  var_dump($merge);
+  $deepMerge = sfToolkit::arrayDeepMerge($array1, $array2);
+  var_dump($deepMerge);
+△●●●●
+
+
+★［リスト9-7］――array_merge()とsfToolkit::arrayDeepMerge()の結果の比較★
+▽●●●●
+// array_merge()の結果
+array(3) {
+  ["foo"]=>
+  array(2) {
+    ["bar1"]=>
+    string(8) "bar1data"
+    ["bar3"]=>
+    string(8) "bar3data"
+  }
+  ["baz"]=>
+  string(7) "bazdata"
+  ["baz2"]=>
+  string(8) "baz2data"
+}
+// sfToolkit::arrayDeepMerge()の結果
+array(3) {
+  ["foo"]=>
+  array(3) {
+    ["bar1"]=>
+    string(8) "bar1data"
+    ["bar2"]=>
+    string(8) "bar2data"
+    ["bar3"]=>
+    string(8) "bar3data"
+  }
+  ["baz"]=>
+  string(7) "bazdata"
+  ["baz2"]=>
+  string(8) "baz2data"
+}
+△●●●●
+
+
+★［リスト9-8］――sfToolkit::clearDirectory()の使い方★
+▽●●●●
+  // cache/my_cacheディレクトリ内を空にする
+  sfToolkit::clearDirectory(sfConfig::get('sf_cache_dir') . '/my_cache');
+△●●●●
+
+
+★［リスト9-9］――sfToolkit::clearGlob()の使い方★
+▽●●●●
+  // cache/my_cacheディレクトリ内のcsvファイルを削除する
+  sfToolkit::clearGlob(sfConfig::get('sf_cache_dir') . '/my_cache/*.csv');
+△●●●●
+
+
+★［リスト9-10］――sfToolkit::isArrayValuesEmpty()の使い方★
+▽●●●●
+  $test1 = array(
+    'a' => 1,
+    'b' => null
+  );
+  $test2 = array(
+    'a' => '',
+    'b' => null
+  );
+  $ret = sfToolkit::isArrayValuesEmpty($test1);
+  var_dump($ret);
+  $ret = sfToolkit::isArrayValuesEmpty($test2);
+  var_dump($ret);
+△●●●●
+
+
+★［リスト9-11］――sfToolkit::isPathAbsolute()の使い方★
+▽●●●●
+  $path1 = '/this/is/absolute/path.txt';
+  $ret   = sfToolkit::isPathAbsolute($path1);
+  var_dump($ret);      // TRUE
+  $path2 = 'this/is/not/absolute.php';
+  $ret   = sfToolkit::isPathAbsolute($path2);
+  var_dump($ret);      // FALSE
+△●●●●
+
+
+★［リスト9-12］――sfConfigの設定値を設定名で埋め込む★
+▽●●●●
+  $message = 'libディレクトリの絶対パスはsf_lib_dirで参照でき、%sf_lib_dir%です。';
+  $message = sfToolkit::replaceConstants($message);
+  echo $message;       // libディレクトリの絶対パスはsf_lib_dirで参照でき、/var/www/sf14/libです。
+△●●●●
+
+
+★［リスト9-13］――sfContextの使い方★
+▽●●●●
+  // Configurationオブジェクトを取得する
+  $configuration = sfContext::getInstance()->getConfiguration();
+
+  // ロガーを取得する
+  $logger = sfContext::getInstance()->getLogger();
+△●●●●
+
+
+★［リスト9-14］――sfDoctrinePagerをインスタンス化し、init()を呼び出す★
+▽●●●●
+  $pager = new sfDoctrinePager('Article', 3);
+  $pager->setPage(2);
+  $pager->init();
+
+  foreach ($pager->getResults() as $article)
+  {
+    echo $article->getTitle() . PHP_EOL;
+  }
+△●●●●
+
+
+★［リスト9-15］――アクションメソッドにページャーを組み込む★
+▽●●●●
+  public function executeList(sfWebRequest $request)
+  {
+    $pager = new sfDoctrinePager('Article', 3);
+    $pager->setPage($request->getParameter('p', 1));
+    $pager->setTableMethod('queryLatestNews');
+    $pager->init();
+    $this->pager = $pager;
+  }
+△●●●●
+
+
+★［リスト9-16］――条件をつけた一覧取得用のクエリー生成メソッド★
+▽●●●●
+  public function queryLatestNews()
+  {
+    return self::getInstance()->createQuery()
+      ->from('Article a')
+      ->where('a.category = ?', 'news')
+      ;
+  }
+△●●●●
+
+
+★［リスト9-17］――sfUserクラスの使い方★
+▽●●●●
+  // アクション内では、getUser()メソッドでsfUserオブジェクトを取得
+  $user = $this->getUser();
+
+  // データを設定
+  $user->setAttribute('some_key', 'test value');
+
+  // フラッシュメッセージを設定
+  $user->setFlash('complete', 'データの登録が完了しました');
+△●●●●
+
+
+★［リスト9-18］――sfBasicSecurityUserを使って認証状態を設定する★
+▽●●●●
+  // アクション内でuserオブジェクトを取得（sfBasicSecurityUserクラスを継承したクラスのオブジェクト）
+  $user = $this->getUser();
+
+  // 認証状態に設定
+  $user->setAuthenticated(true);
+
+  // 権限を設定
+  $user->addCredential('normal');
+△●●●●
+
+
+★［リスト9-19］――セッションストレージの変更★
+▽●●●●
+  storage:
+    class: sfPDOSessionStorage
+    param:
+      session_name: mysession
+      db_table:     session
+      database:     doctrine
+△●●●●
+
+
+★［リスト9-20］――セッションテーブル用のschema.yml★
+▽●●●●
+Session:
+  columns:
+    sess_id:
+      type:    string(64)
+    sess_data:
+      type:    text
+    sess_time:
+      type:    int
+  indexes:
+    session_ik:
+      fields:  [ sess_id ]
+      type:    unique
+△●●●●
+
+
+★［リスト9-21］――ロガーの使い方★
+▽●●●●
+  // アクション内ではgetLogger()メソッドでロガーオブジェクトを取得
+  $logger = $this->getLogger();
+
+  // ロガーの記録メソッドを使ってログに記録
+  $logger->debug('デバッグ用メッセージ');
+△●●●●
+
+
+★［リスト9-22］――組み込みのfactories.ymlのデフォルトのロガー設定★
+▽●●●●
+  logger:
+    class: sfAggregateLogger
+    param:
+      level: debug
+      loggers:
+        sf_web_debug:
+          class: sfWebDebugLogger
+          param:
+            level: debug
+            condition:       %SF_WEB_DEBUG%
+            xdebug_logging:  false
+            web_debug_class: sfWebDebug
+        sf_file_debug:
+          class: sfFileLogger
+          param:
+            level: debug
+            file: %SF_LOG_DIR%/%SF_APP%_%SF_ENVIRONMENT%.log
+△●●●●
+
+
+★［リスト9-23］――アプリケーションのfactories.ymlのprod環境のロガー設定★
+▽●●●●
+prod:
+  logger:
+    class:   sfNoLogger
+    param:
+      level:   err
+      loggers: ~
+△●●●●
+
+
+★［リスト9-24］――sfInflector::camelize()の使い方★
+▽●●●●
+  $from = 'lower_case_name';
+  $to   = sfInflector::camelize($from);
+  echo $to; // LowerCaseName
+△●●●●
+
+
+★［リスト9-25］――sfInflector::underscore()の使い方★
+▽●●●●
+  $from = 'UpperCamelCaseName';
+  $to   = sfInflector::underscore($from);
+  echo $to; // upper_camel_case_name
+△●●●●
+
+

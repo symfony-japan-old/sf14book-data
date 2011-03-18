@@ -1,0 +1,162 @@
+第2章のコマンド
+===============================================================================
+
+★P60
+rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
+
+
+★P60
+yum install --enablerepo="remi" php php-pear php-devel php-pdo php-xml php-mbstring php-process php-pecl-apc mysql-server subversion
+chkconfig httpd on
+chkconfig mysqld on
+/etc/init.d/mysqld restart
+/etc/init.d/httpd restart
+
+
+★P60
+php -v
+
+
+★P61
+httpd -M
+
+
+★P61
+php -r 'phpinfo();' | grep apc
+
+
+★P62
+pecl install apc
+
+
+★P62
+cd /var/www/html
+wget http://sf-to.org/1.4/check.php
+
+
+★P63
+error_reporting = E_ALL | E_STRICT
+
+error_reporting = E_ALL ^E_NOTICE ^E_DEPRECATED
+
+
+★P63
+cd /var/www/html
+wget http://www.symfony-project.org/get/sf_sandbox_1_4.tgz
+tar zxvf sf_sandbox_1_4.tgz
+mv sf_sandbox sf14
+rm sf_sandbox_1_4.tgz
+
+
+★P64
+cd /var/www/html
+mkdir -p sf14/lib/vendor
+cd sf14/lib/vendor
+wget http://www.symfony-project.org/get/symfony-1.4.9.tgz
+tar zxvf symfony-1.4.9.tgz
+mv symfony-1.4.9 symfony
+rm symfony-1.4.9.tgz
+
+
+★P64
+cd /var/www/html/sf14
+php lib/vendor/symfony/data/bin/symfony generate:project sf14
+
+
+★P64
+php symfony generate:app frontend
+
+
+★P64
+cd /var/www/html
+mkdir -p sf14/lib/vendor
+cd sf14/lib/vendor
+svn co http://svn.symfony-project.com/branches/1.4 symfony
+
+
+★P64
+cd /var/www/html/sf14
+php lib/vendor/symfony/data/bin/symfony generate:project sf14
+
+
+★P65
+php symfony generate:app frontend
+
+
+★P65
+php symfony -V
+
+
+★P65
+symfony version 1.4.9 (/var/www/html/sf14/lib/vendor/symfony/lib)
+
+
+★P66
+ln -s /var/www/html/sf14/lib/vendor/symfony/data/web/sf /var/www/html/sf14/web
+
+
+★P68
+httpd -M
+
+
+★P72
+php lib\vendor\symfony\data\bin\symfony generate:project sf14
+
+
+★P72
+php symfony generate:app frontend
+
+
+★P73
+php lib\vendor\symfony\data\bin\symfony generate:project sf14
+
+
+★P73
+php lib\vendor\symfony\data\bin\symfony generate:project sf14
+
+
+★P73
+php symfony -V
+
+
+★P73
+symfony version 1.4.9 (C:¥xampp¥htdocs¥sf14¥lib¥vendor¥symfony¥lib)
+
+
+★P80
+/Applications/MAMP/bin/php5.3/bin/php lib/vendor/symfony/data/bin/symfony generate:project sf14
+
+
+★P80
+/Applications/MAMP/bin/php5.3/bin/php symfony generate:app frontend
+
+
+★P81
+svn co http://svn.symfony-project.com/branches/1.4 symfony
+
+
+★P81
+/Applications/MAMP/bin/php5.3/bin/php lib/vendor/symfony/data/bin/symfony generate:project sf14
+
+
+★P81
+/Applications/MAMP/bin/php5.3/bin/php symfony generate:app frontend
+
+
+★P82
+/Applications/MAMP/bin/php5.3/bin/php symfony -V
+
+
+★P82
+symfony version 1.4.9 (/Applications/MAMP/htdocs/sf14/lib/vendor/symfony/lib)
+
+
+★P82
+ln -s /Applications/MAMP/htdocs/sf14/lib/vendor/symfony/data/web/sf /Applications/MAMP/htdocs/sf14/web
+
+
+★P84
+git clone git://github.com/vjousse/symfony-1.4.git lib/vendor/symfony
+
+

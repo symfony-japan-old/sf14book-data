@@ -1,0 +1,24 @@
+第3章のURL
+===============================================================================
+
+★P98
+Apache ドキュメント - DocumentRootディレクティブ
+http://httpd.apache.org/docs/2.2/mod/core.html#documentroot
+
+
+★P99
+Apache ドキュメント - 名前ベースのバーチャルホスト
+http://httpd.apache.org/docs/2.2/vhosts/name-based.html
+
+
+★P102
+Apache ドキュメント - mod_access
+http://httpd.apache.org/docs/2.0/ja/mod/mod_access.html
+
+
+★P105
+Reference Book　 http://www.symfony-project.org/reference/1_4/ja/05-Factories#chapter_05_storage
+
+
+
+

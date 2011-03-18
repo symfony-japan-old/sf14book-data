@@ -1,0 +1,41 @@
+第4章のURL
+===============================================================================
+
+★P110
+名前ベースのバーチャルホスト
+http://httpd.apache.org/docs/2.2/ja/vhosts/name-based.html
+
+
+★P125
+schema.ymlの完全なリファレンス
+http://www.doctrine-project.org/projects/orm/1.2/docs/manual/yamlschema-files/ja
+
+
+★P128
+サポートサイトのダウンロードページ
+http://books.symfony.gr.jp/14book/download/
+
+
+★P144
+サポートサイトのダウンロードページ
+http://books.symfony.gr.jp/14book/download/
+
+
+★P179
+Gentle Introduction - 第14 章 Adminジェネレータ
+http://www.symfony-project.org/gentle-introduction/1_4/ja/14-Admin-Generator
+
+Reference Book - generator.yml 設定ファイル
+http://www.symfony-project.org/reference/1_4/ja/06-Admin-Generator
+
+
+★P179
+Apache ドキュメント - 認証、承認、アクセス制御
+http://httpd.apache.org/docs/2.2/ja/howto/auth.html
+
+
+★P184
+http://www.symfony-project.org/reference/1_4/ja/04-Settings#chapter_04_sub_cache
+http://www.symfony-project.org/reference/1_4/ja/09-Cache
+
+

@@ -1,0 +1,506 @@
+第7章のリスト
+===============================================================================
+
+★［リスト7-1］――sfWidgetFormSchemaFormatterTableクラス★
+▽●●●●
+class sfWidgetFormSchemaFormatterTable extends sfWidgetFormSchemaFormatter
+{
+  protected
+    $rowFormat       = "<tr>\n  <th>%label%</th>\n  <td>%error%%field%%help%%hidden_fields%</td>\n</tr>\n",
+    $errorRowFormat  = "<tr><td colspan=\"2\">\n%errors%</td></tr>\n",
+    $helpFormat      = '<br />%help%',
+    $decoratorFormat = "<table>\n  %content%</table>";
+}
+△●●●●
+
+
+★［リスト7-2］――sjWidgetFormSchemaFormatterDivクラス★
+▽●●●●
+class sjWidgetFormSchemaFormatterDiv extends sfWidgetFormSchemaFormatter
+{
+  protected
+    $rowFormat       = "<div class=\"formrow\">\n  %error%%label%\n  %field%%help%\n%hidden_fields%</div>\n",
+    $errorRowFormat  = "<li>\n%errors%</li>\n",
+    $helpFormat      = '<br />%help%',
+    $decoratorFormat = "<div class=\"formcontent\">\n  %content%</div>";
+}
+△●●●●
+
+
+★［リスト7-3］――独自のフォームフォーマッタに置き換える★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    // :
+    $this->widgetSchema->addFormFormatter('div', new sjWidgetFormSchemaFormatterDiv($this->widgetSchema));
+    $this->widgetSchema->setFormFormatterName('div');
+△●●●●
+
+
+★［リスト7-4］――setAttribute()の使用例★
+▽●●●●
+    $this->widgetSchema['name']->setAttribute('style', 'color:#FF0000');
+△●●●●
+
+
+★［リスト7-5］――属性を指定したウィジェットのHTML出力結果★
+▽●●●●
+<input style="color:#FF0000" type="text" name="test[name]" id="test_name" />△●●●●
+
+
+★［リスト7-6］――テンプレートでフィールドの属性を指定★
+▽●●●●
+<?php echo $form['name']->renderRow(array('style'=>'color:#FF0000')) ?>
+△●●●●
+
+
+★［リスト7-7］――sfWidgetFormSelectCheckboxクラスのformatter()メソッド★
+▽●●●●
+  public function formatter($widget, $inputs)
+  {
+    $rows = array();
+    foreach ($inputs as $input)
+    {
+      $rows[] = $this->renderContentTag('li', $input['input'].$this->getOption('label_separator').$input['label']);
+    }
+
+    return !$rows ? '' : $this->renderContentTag('ul', implode($this->getOption('separator'), $rows), array('class' => $this->getOption('class')));
+  }
+△●●●●
+
+
+★［リスト7-8］――フォームクラスでチェックボックス用のformatter()を用意★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    $this->setWidgets(array(
+      'type' => new sfWidgetFormSelectCheckbox(array(
+        'choices'  => array(1, 2, 3),
+        'formatter'=> array($this, 'typeFormatter'),
+      )),
+    ));
+    // :
+  }
+
+  public function typeFormatter($widget, $inputs)
+  {
+    $rows = array();
+    foreach ($inputs as $input)
+    {
+      $rows[] = $widget->renderContentTag('span', $input['input'].$widget->getOption('label_separator').$input['label']);
+    }
+
+    return !$rows ? '' : $widget->renderContentTag('div', implode($widget->getOption('separator'), $rows), array('class' => $widget->getOption('class')));
+  }
+△●●●●
+
+
+★［リスト7-9］――sjWidgetFormChoiceFormattableクラス★
+▽●●●●
+class sjWidgetFormChoiceFormattable extends sfWidgetFormChoice
+{
+  protected function configure($options = array(), $attributes = array())
+  {
+    parent::configure($options, $attributes);
+
+    $this->addOption('item_format', '<li>%s</li>');
+    $this->addOption('all_format',  '<ul>%s</ul>');
+    $this->setOption('renderer_options', array('formatter'=> array($this, 'formatter')));
+    $this->setOption('expanded',    true);
+  }
+
+  public function formatter($widget, $inputs)
+  {
+    $rows = array();
+    $item_format = $this->getOption('item_format');
+    foreach ($inputs as $input)
+    {
+      $rows[] = sprintf($item_format, $input['input'] . $this->getOption('label_separator') . $input['label']);
+    }
+
+    return !$rows ? '' : sprintf($this->getOption('all_format'), implode($this->getOption('separator'), $rows));
+  }
+}
+△●●●●
+
+
+★［リスト7-10］――カスタムウィジェットを使う★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    $this->setWidgets(array(
+      'type' => new sjWidgetFormChoiceFormattable(array(
+        'choices'  => array(1, 2, 3),
+        'item_format' => '<span>%s</span>',
+        'all_format'  => '<div>%s</div>',
+      )),
+    ));
+    // :
+  }
+△●●●●
+
+
+★［リスト7-11］――バリデータのpetternオプションを指定する★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    // :
+    // この正規表現は、以下のURLにある大崎氏作のPerl版のものをPHP構文に書きなおしたもの
+    // http://www.din.or.jp/~ohzaki/regex.htm
+    // http://www.din.or.jp/~ohzaki/mail_regex.htm
+    // (2009/08/13バージョン)
+    $this->setValidators(array(
+      'email' => new sfValidatorEmail(array(
+        'pattern' => '{^(?:[-!#-\'*+/-9=?A-Z^-~]+(?:\.[-!#-\'*+/-9=?A-Z^-~]+)*|"(?:[!#-\[\]-~]|\\\\[\x09 -~])*")@[-!#-\'*+/-9=?A-Z^-~]+(?:\.[-!#-\'*+/-9=?A-Z^-~]+)*$}i',
+      )),
+    ));
+    // :
+  }
+}
+△●●●●
+
+
+★［リスト7-12］――メールアドレスを厳密にチェックするsfValidatorEmailRFC★
+▽●●●●
+class sjValidatorEmailRFC extends sfValidatorEmail
+{
+  // この正規表現は、以下のURLにある大崎氏作のPerl版のものをPHP構文に書きなおしたもの
+  // http://www.din.or.jp/~ohzaki/regex.htm
+  // http://www.din.or.jp/~ohzaki/mail_regex.htm
+  // (2009/08/13バージョン)
+  static $REGEX_EMAIL_RFC = '{^(?:[-!#-\'*+/-9=?A-Z^-~]+(?:\.[-!#-\'*+/-9=?A-Z^-~]+)*|"(?:[!#-\[\]-~]|\\\\[\x09 -~])*")@[-!#-\'*+/-9=?A-Z^-~]+(?:\.[-!#-\'*+/-9=?A-Z^-~]+)*$}i';
+
+  protected function configure($options = array(), $messages = array())
+  {
+    parent::configure($options, $messages);
+
+    $this->setOption('pattern', self::$REGEX_EMAIL_RFC);
+  }
+}
+△●●●●
+
+
+★［リスト7-13］――メールアドレスの検証にsjValidatorEmailRFCを使う★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    // :
+    $this->setValidators(array(
+      'email' => new sjValidatorEmailRFC(),                  // 第1版では末尾が「;」となっておりました。「,」の間違いです。
+    ));
+    // :
+  }
+}
+△●●●●
+
+
+★［リスト7-14］――携帯キャリアのメールアドレスかどうかチェックするsjValidatorEmailKtai★
+▽●●●●
+class sjValidatorEmailKtai extends sfValidatorEmail
+{
+  // 携帯電話のドメインに限定
+  public static $KTAI_DOMAINS = array(
+    'docomo\.ne\.jp',
+    'ezweb\.ne\.jp',
+    '[^\.]*\.biz\.ezweb\.ne\.jp',
+    'disney\.ne\.jp',
+    '[^\.]*\.softbank\.jp',
+    'softbank\.ne\.jp',
+    '[^\.]*\.vodafone\.ne\.jp',
+    'jp-[^\.]*\.ne\.jp',
+    'willcom\.com',
+    '[^\.]*\.pdx\.ne\.jp',
+    'pdx\.ne\.jp',
+  );
+
+  protected function configure($options = array(), $messages = array())
+  {
+    parent::configure($options, $messages);
+
+    $pattern = '{^([^@\s]+)@(' . implode(self::$KTAI_DOMAINS ,')|(') . ')$}i';
+
+    $this->setOption('pattern', $pattern);
+  }
+}
+△●●●●
+
+
+★［リスト7-15］――全角チェック、半角への変換オプションを追加したsjValidatorEmailKtai★
+▽●●●●
+<?php
+class sjValidatorEmailKtai extends sfValidatorEmail
+{
+  // :
+
+  protected function configure($options = array(), $messages = array())
+  {
+    $this->addOption('error_multibyte',   true);
+    $this->addOption('convert_multibyte', false);
+    parent::configure($options, $messages);
+
+    $pattern = '{^([^@\s]+)@(' . implode(self::$KTAI_DOMAINS ,')|(') . ')$}i';
+
+    $this->setOption('pattern', $pattern);
+  }
+
+  protected function doClean($value)
+  {
+    if ($this->getOption('convert_multibyte'))
+    {
+        $value = mb_convert_kana($value, 'ak', 'UTF8');
+    }
+
+    $clean = parent::doClean($value);
+
+    if ($this->getOption('error_multibyte'))
+    {
+      if (strlen($value) !== mb_strlen($value))
+      {
+        throw new sfValidatorError($this, 'invalid', array('value' => $value));
+      }
+    }
+
+    return $clean;
+  }
+}
+△●●●●
+
+
+★［リスト7-16］――入力内容を自動的に半角に変換する★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    // :
+    $this->setValidators(array(
+      'email' => new sjValidatorEmailKtai(array(
+        'convert_multibyte' => true,
+      )),                                          // 第1版で末尾が「;」となっておりました。「,」の間違いです。
+    ));
+    // :
+  }
+}
+△●●●●
+
+
+★［リスト7-17］――POSTバリデータの設定★
+▽●●●●
+    $this->validatorSchema->setPostValidator(バリデータ);
+△●●●●
+
+
+★［リスト7-18］――2つのメールアドレスフィールドの一致チェック★
+▽●●●●
+    $this->validatorSchema->setPostValidator(
+      new sfValidatorSchemaCompare('email1', '==', 'email2')
+    );
+△●●●●
+
+
+★［リスト7-19］――sfValidatorCallbackの使い方★
+▽●●●●
+class TestForm extends BaseForm
+{
+  public function configure()
+  {
+    // :
+
+    $this->validatorSchema->setPostValidator(new sfValidatorCallback(
+      array(
+        'callback' => array($this, 'validate'),
+      )
+    ));
+  }
+
+  public function validate(sfValidatorBase $validator, $values)
+  {
+    // $values['name']といった形式でフィールドの値にアクセス可能
+    if (フィールドの値の比較)
+    {
+      throw new sfValidatorError($validator, 'invalid');
+    }
+  }
+}
+△●●●●
+
+
+★［リスト7-20］――sfDoctrineRouteを使ったルートの設定例★
+▽●●●●
+page_show_object:
+  url:         /page/showobject/:slug
+  class:       sfDoctrineRoute
+  options:     { model:  Page,     type:   object }
+  param:       { module: Page,     action: ShowObject }
+△●●●●
+
+
+★［リスト7-21］――オブジェクトルートから呼び出されるアクションの例★
+▽●●●●
+  public function executeShowObject(sfWebRequest $request)
+  {
+    $this->page = $this->getRoute()->getObject();
+  }
+△●●●●
+
+
+★［リスト7-22］――タスクの雛形★
+▽●●●●
+<?php
+
+class helloTask extends sfBaseTask
+{
+  protected function configure()
+  {
+    // // add your own arguments here
+    // $this->addArguments(array(
+    //   new sfCommandArgument('my_arg', sfCommandArgument::REQUIRED, 'My argument'),
+    // ));
+
+    $this->addOptions(array(
+      new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, 'The application name'),
+      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
+      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
+      // add your own options here
+    ));
+
+    $this->namespace        = '';
+    $this->name             = 'hello';
+    $this->briefDescription = '';
+    $this->detailedDescription = <<<EOF
+The [hello|INFO] task does things.
+Call it with:
+
+  [php symfony hello|INFO]
+EOF;
+  }
+
+  protected function execute($arguments = array(), $options = array())
+  {
+    // initialize the database connection
+    $databaseManager = new sfDatabaseManager($this->configuration);
+    $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
+
+    // add your code here
+  }
+}
+△●●●●
+
+
+★［リスト7-23］――helloタスクのconfigure()メソッド★
+▽●●●●
+  protected function configure()
+  {
+    $this->addArguments(array(
+      new sfCommandArgument('name', sfCommandArgument::REQUIRED, 'who you want to greet'),
+    ));
+
+    $this->addOptions(array(
+      new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, 'The application name'),
+      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
+      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
+    ));
+
+    $this->namespace        = 'mytask';
+    $this->name             = 'hello';
+    $this->briefDescription = 'Greeting!';
+    $this->detailedDescription = <<<EOF
+The [mytask:hello|INFO] task simply greets.
+Call it with:
+
+  [php symfony mytask:hello name|INFO]
+EOF;
+  }
+△●●●●
+
+
+★［リスト7-24］――helloタスクのexecute()メソッドの実装★
+▽●●●●
+  protected function execute($arguments = array(), $options = array())
+  {
+    $this->log('Hello, ' . $arguments['name'] . '!');
+  }
+△●●●●
+
+
+★［リスト7-25］――外部サイトのフィードをキャッシュするタスク★
+▽●●●●
+  public function execute($arguments = array(), $options = array())
+  {
+    $url = 'http://symfony.gr.jp/feed';
+
+    $feedCacheDir = sfConfig::get('sf_data_dir').'/feed';
+    $filename = sha1($url);
+
+    $cache = new sfFileCache(array('cache_dir' => $feedCacheDir));
+    $feed = $cache->get($filename, '');
+
+    if (empty($feed))
+    {
+      ;
+      if (!$feed = file_get_contents($url))
+      {
+        throw new Exception('フィードの取得に失敗しました');
+      }
+      $cache->set($filename, $feed);
+    }
+  }
+△●●●●
+
+
+★［リスト7-26］――イベントディスパッチャーオブジェクトを取得★
+▽●●●●
+  // コンフィギュレーションオブジェクトからイベントディスパッチャーを取得
+  $dispatcher = $configuration->getEventDispatcher();
+
+  // コンテキスト経由で取得
+  $dispatcher = sfContext::getInstance()->getEventDispatcher();
+
+  // コンフィギュレーションクラス内であれば、直接$this->dispatcherを参照
+△●●●●
+
+
+★［リスト7-27］――notify()メソッドでイベントを通知する★
+▽●●●●
+  $dispatcher->notify(new sfEvent($this, 'event.name'));
+△●●●●
+
+
+★［リスト7-28］――イベントのリスナーを登録★
+▽●●●●
+  $dispatcher->connect('event.name', array($this, 'listenToEventName'));
+△●●●●
+
+
+★［リスト7-29］――task.cache.clearイベントを拡張★
+▽●●●●
+class ProjectConfiguration extends sfProjectConfiguration
+{
+  public function setup()
+  {
+    $this->enablePlugins('sfDoctrinePlugin');
+
+    $this->dispatcher->connect('task.cache.clear', array($this, 'listenToTaskCacheClear'));  // (1)
+  }
+
+  public function listenToTaskCacheClear(sfEvent $event)
+  {
+    if ('feed' === $event['type'])
+    {
+      sfToolkit::clearDirectory(sfConfig::get('sf_data_dir') . '/feed');
+    }
+  }
+}
+△●●●●
+
+

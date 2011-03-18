@@ -1,0 +1,1063 @@
+第4章のリスト
+===============================================================================
+
+★［リスト4-1］――バーチャルホストの設定（Linux）★
+▽●●●●
+<VirtualHost *:80>
+    ServerName symfony-band.local
+    DocumentRoot /var/www/symfony-band/web/
+</VirtualHost>
+△●●●●
+
+
+★［リスト4-2］――バーチャルホストの設定（Windows）★
+▽●●●●
+<VirtualHost *:80>
+    ServerName symfony-band.local
+    DocumentRoot C:\xampp\htdocs\symfony-band\web\
+</VirtualHost>
+△●●●●
+
+
+★［リスト4-3］――デフォルトのactions.class.phpファイル★
+▽●●●●
+<?php
+
+/**
+ * Hello actions.
+ *
+ * @package    symfony-band
+ * @subpackage Hello
+ * @author     symfony
+ * @version    SVN: $Id: actions.class.php 23810 2009-11-12 11:07:44Z Kris.Wallsmith $
+ */
+class HelloActions extends sfActions
+{
+ /**
+  * Executes index action
+  *
+  * @param sfRequest $request A request object
+  */
+  public function executeIndex(sfWebRequest $request)
+  {
+    $this->forward('default', 'module');
+  }
+}
+△●●●●
+
+
+★［リスト4-4］――デフォルトのlayout.php★
+▽●●●●
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <?php include_http_metas() ?>
+    <?php include_metas() ?>
+    <?php include_title() ?>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <?php include_stylesheets() ?>
+    <?php include_javascripts() ?>
+  </head>
+  <body>
+    <?php echo $sf_content ?>
+  </body>
+</html>
+△●●●●
+
+
+★［リスト4-5］――HelloモジュールのWorldアクション★
+▽●●●●
+  public function executeWorld()
+  {
+  }
+△●●●●
+
+
+★［リスト4-6］――WorldSuccess.php★
+▽●●●●
+<h2>Hello, World! <?php echo date('Y/m/d') ?></h2>
+△●●●●
+
+
+★［リスト4-7］――sfView::ERRORを返す★
+▽●●●●
+  public function executeWorld()
+  {
+    return sfView::ERROR;
+  }
+△●●●●
+
+
+★［リスト4-8］――databases.yml★
+▽●●●●
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/07-Databases
+
+all:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn:      mysql:host=localhost;dbname=symfonyband
+      username: root
+      password:
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_unicode_ci
+△●●●●
+
+
+★［リスト4-9］――schema.ymlにスキーマを定義する★
+▽●●●●
+Page:
+  actAs:
+    Timestampable: ~
+    Sluggable: ~
+  columns:
+    title:
+      type:    string(100)
+      notnull: true
+      default: ''
+    body:
+      type:    clob
+      notnull: true
+      default: ''
+    category:
+      type:    string(32)
+      notnull: true
+      default: ''
+△●●●●
+
+
+★［リスト4-10］――schema.ymlの構造★
+▽●●●●
+モデル名:
+  actAs:
+    ビヘイビア
+    ：
+  columns:
+    カラム名:
+      カラムごとの設定
+    ：
+△●●●●
+
+
+★［リスト4-11］――schema.ymlの記述に対応するCREATE TABLE文★
+▽●●●●
+CREATE TABLE page (
+  id BIGINT AUTO_INCREMENT,
+  title VARCHAR(100) DEFAULT '' NOT NULL,
+  body LONGTEXT DEFAULT '' NOT NULL,
+  category VARCHAR(32) DEFAULT '' NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  slug VARCHAR(255),
+  UNIQUE INDEX page_sluggable_idx (slug),
+  PRIMARY KEY(id)
+) ENGINE = INNODB;
+△●●●●
+
+
+★［リスト4-12］――フィクスチャーファイル★
+▽●●●●
+Page:
+  TopPage:
+    title:       トップページ
+    slug:        top
+    category:    ~
+    body:        トップページのコンテンツです。
+  AboutPage:
+    title:       Symfony楽団について
+    slug:        about
+    category:    ~
+    body:        Symfony楽団の紹介ページです。
+  JoinUsPage:
+    title:       メンバー募集
+    slug:        joinus
+    category:    ~
+    body:        Symfony楽団では、メンバーを募集しています！
+  NewsOpenPage:
+    title:       Symfony楽団のホームページがオープンしました
+    slug:        20101015-homepage-open
+    category:    news
+    body:        |
+                   本日、Symfony楽団のホームページをようやくオープンできました。
+                   ホームページでは、Symfony楽団に関するさまざまな情報を発信していきますので、みなさん応援よろしくお願いします！
+    created_at:  '2010-10-15 00:00:00'
+  NewsEvent1Page:
+    title:       2010年定期演奏会のご案内
+    slug:        concert-2010
+    category:    news
+    body:        |
+                   Symfony楽団の、2010年の定期演奏会についてのご案内です。
+                   日時：2010年12月24日　17時〜21時
+                   場所：Symfony城ホール
+                   入場料：5000円
+    created_at:  '2010-11-15 00:00:00'
+  NewsEvent2Page:
+    title:       Symfony楽団と一緒に新年を迎えよう！
+    slug:        countdown-to-2011
+    category:    news
+    body:        |
+                   2010年の締めくくりといたしまして、毎年恒例になっている「みんなで第九を歌って年を越そう！」イベントを今年も開催いたします。
+                   日時：2010年12月31日　22時〜翌5時
+                   場所：Symfony城ホール
+                   参加費：1000円
+                   食事や飲み物は参加者の持ち寄りになります。みなさんご自慢の料理を是非ご持参ください。
+    created_at:  '2010-12-06 00:00:00'
+  NewsJoinusPage:
+    title:       2011年の活動に向けて、メンバーを募集しています
+    slug:        20101021-joinus
+    category:    news
+    body:        |
+                   Symfony楽団では、私たちと一緒に音楽を楽しんでくれるメンバーを募集しています。
+                   来年の定期演奏会へ向けて、現在特に募集したいパートは
+                   ・トランペット
+                   ・サックス
+                   ですが、これ以外の方や、楽団の事務などを手伝っていただける方も大歓迎です！
+                   詳細は<a href="/page/joinus">メンバー募集</a>のページをご覧ください。
+    created_at:  '2010-12-20 00:00:00'
+  NewsEventReport:
+    title:       2010年の定期演奏会が無事終了しました
+    slug:        convert-2010-report
+    category:    news
+    body:        |
+                   2010年11月15日に開催した2010年の定期演奏会は、
+    created_at:  '2010-12-21 00:00:00'
+△●●●●
+
+
+★［リスト4-13］――モデルからレコードを検索する★
+▽●●●●
+$page = PageTable::getInstance()->findOneBySlug('top');
+△●●●●
+
+
+★［リスト4-14］――モデルから取得したデータをループで処理する★
+▽●●●●
+$pageList = PageTable::getInstance()->find();
+foreach ($pageList as $page)
+{
+  // 各Pageごとの処理
+}
+△●●●●
+
+
+★［リスト4-15］――Showアクションの実装★
+▽●●●●
+  public function executeShow(sfWebRequest $request)
+  {
+    $this->page = PageTable::getInstance()->findOneBySlug('top');
+  }
+△●●●●
+
+
+★［リスト4-16］――ShowSuccess.phpファイル★
+▽●●●●
+<br />
+<h2>このページのタイトルは、「<?php echo $page->getTitle() ?>」です。</h2>
+△●●●●
+
+
+★［リスト4-17］――デフォルトのrouting.yml★
+▽●●●●
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/10-Routing
+
+# default rules
+homepage:
+  url:   /
+  param: { module: default, action: index }
+
+# generic rules
+# please, remove them by adding more specific rules
+default_index:
+  url:   /:module
+  param: { action: index }
+
+default:
+  url:   /:module/:action/*
+△●●●●
+
+
+★［リスト4-18］――ルート設定の構造★
+▽●●●●
+ルート名:
+  url:    このルート設定にマッチさせるURLのパターン
+  param:  このルート設定のパラメータ
+△●●●●
+
+
+★［リスト4-19］――ルートパラメータへリクエストパラメータと同様にアクセス★
+▽●●●●
+public function executeIndex(sfWebRequest $request)
+{
+  $param1 = $request->getParameter('param1');
+  echo $param1;  // foo
+  $param2 = $request->getParameter('param2');
+  echo $param2;  // bar
+}
+△●●●●
+
+
+★［リスト4-20］――page_showルートを追加する★
+▽●●●●
+page_show:
+  url:         /page/:slug
+  param:       { module: Page, action: Show }
+△●●●●
+
+
+★［リスト4-21］――Page/Showアクションのコードを修正★
+▽●●●●
+  public function executeShow(sfWebRequest $request)
+  {
+    // スラグパラメータを取得し、スラグからページを取得する
+    $slug = $request->getParameter('slug');
+    $this->page = PageTable::getInstance()->findOneBySlug($slug);
+  }
+△●●●●
+
+
+★［リスト4-22］――routing.ymlの追加・修正★
+▽●●●●
+homepage:
+  url:         /
+  param:       { module: Page, action: Show, slug: top }
+
+page_show:
+  url:         /page/:slug
+  param:       { module: Page, action: Show }
+
+news_list:
+  url:         /news
+  param:       { module: Page, action: NewsList }
+
+news_show:
+  url:         /news/:slug
+  param:       { module: Page, action: NewsShow }
+△●●●●
+
+
+★［リスト4-23］――Page/NewsShowアクションとPage/NewsListアクションの実装★
+▽●●●●
+  public function executeNewsShow(sfWebRequest $request)
+  {
+    // スラグパラメータを取得し、スラグからページを取得する
+    $slug = $request->getParameter('slug');
+    $this->page = PageTable::getInstance()->findOneBySlug($slug);
+  }
+
+  public function executeNewsList(sfWebRequest $request)
+  {
+    // カテゴリ名newsに対応するページの一覧を取得する
+    $this->pageList = PageTable::getInstance()->findByCategory('news');
+  }
+△●●●●
+
+
+★［リスト4-24］――ShowSuccess.phpファイル★
+▽●●●●
+<div id="content">
+  <h2><?php echo $page->getTitle() ?></h2>
+  <p><?php echo nl2br($page->getRawValue()->getBody()) ?></p>
+</div>
+△●●●●
+
+
+★［リスト4-25］――NewsListSuccess.phpファイル★
+▽●●●●
+<h2>お知らせの一覧</h2>
+<?php if (count($pageList)): ?>
+  <ul>
+    <?php foreach ($pageList as $page): ?>
+      <li>
+        <?php echo $page->getDateTimeObject('created_at')->format('m/d') ?>
+        <?php echo link_to($page->getTitle(), 'news_show',  array('slug'=>$page->getSlug())) ?>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+<?php else: ?>
+  お知らせはありません
+<?php endif; ?>
+△●●●●
+
+
+★［リスト4-26］――NewsShowSuccess.phpファイル★
+▽●●●●
+<div id="content">
+  <h2><?php echo $page->getTitle() ?></h2>
+  <p><?php echo nl2br($page->getRawValue()->getBody()) ?></p>
+</div>
+<div class="contentNav">
+  <?php echo link_to('お知らせの一覧に戻る', 'news_list') ?>
+</div>
+△●●●●
+
+
+★［リスト4-27］――layout.php内のヘッダー部分★
+▽●●●●
+    <?php include_http_metas() ?>
+    <?php include_metas() ?>
+    <?php include_title() ?>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <?php include_stylesheets() ?>
+    <?php include_javascripts() ?>
+△●●●●
+
+
+★［リスト4-28］――初期状態のview.yml★
+▽●●●●
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/13-View
+
+default:
+  http_metas:
+    content-type: text/html
+
+  metas:
+    #title:        symfony project
+    #description:  symfony project
+    #keywords:     symfony, project
+    #language:     en
+    #robots:       index, follow
+
+  stylesheets:    [main.css]
+
+  javascripts:    []
+
+  has_layout:     true
+  layout:         layout
+△●●●●
+
+
+★［リスト4-29］――変更後のview.yml★
+▽●●●●
+default:
+  http_metas:
+    content-type: text/html
+
+  metas:
+    title:        symfony楽団
+    description:  クラシック音楽を演奏するグループです
+    keywords:     symfony, 楽団, シンフォニー, 募集, 紹介
+    language:     ja
+    robots:       index, follow
+
+  stylesheets:    [reset.css, text.css, 960.css, main.css]
+
+  javascripts:    []
+
+  has_layout:     true
+  layout:         layout
+△●●●●
+
+
+★［リスト4-30］――デザインを適用したlayout.php★
+▽●●●●
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <?php include_http_metas() ?>
+    <?php include_metas() ?>
+    <?php include_title() ?>
+    <?php include_stylesheets() ?>
+    <?php include_javascripts() ?>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <div class="container_12">
+          <div class="grid_12">
+            <h1><?php echo link_to('Symfony楽団公式サイト', 'homepage') ?></h1>
+          </div>
+          <div id="menu">
+            <div class="grid_12">
+              <ul>
+                <li><?php echo link_to('トップ', 'homepage') ?></li>
+                <li><?php echo link_to('Symfony楽団について', 'page_show', array('slug'=>'about')) ?></li>
+                <li><?php echo link_to('お知らせ', 'news_list') ?></li>
+                <li><?php echo link_to('メンバー募集', 'page_show', array('slug'=>'joinus')) ?></li>
+                <li><?php echo link_to('お問い合わせ',  'inquiry_new') ?></li>
+              </ul>
+            </div>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+      <div id="main">
+        <div class="container_12">
+          <div class="grid_3">
+            <div id="left">
+              <p>新着情報一覧</p>
+            </div>
+          </div>
+          <div class="grid_9">
+            <div id="right">
+              <?php echo $sf_content ?>
+            </div>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+      <div id="footer">
+        <div class="container_12">
+          <div class="grid_12">
+            <p>Copyright (C) 2011 Symfony楽団</p>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+△●●●●
+
+
+★［リスト4-31］――Inquiryモジュールのactions.class.phpにNewアクションを追加★
+▽●●●●
+  public function executeNew(sfWebRequest $request)
+  {
+  }
+△●●●●
+
+
+★［リスト4-32］――InquiryモジュールのNewSuccess.php★
+▽●●●●
+<h2>お問い合わせフォーム</h2>
+後で実装
+△●●●●
+
+
+★［リスト4-33］――routing.ymlへ追加★
+▽●●●●
+inquiry_new:
+  url:         /inquiry/new
+  param:       { module: Inquiry,  action: New }
+△●●●●
+
+
+★［リスト4-34］――ヘッダー用パーシャル「_Header.php」★
+▽●●●●
+<h1><?php echo link_to('Symfony楽団公式サイト', 'homepage') ?></h1>
+△●●●●
+
+
+★［リスト4-35］――フッター用パーシャル「_Footer.php」★
+▽●●●●
+<p>Copyright (C) 2011 Symfony楽団</p>
+△●●●●
+
+
+★［リスト4-36］――メニュー用パーシャル「_Menu.php」★
+▽●●●●
+<ul>
+  <li><?php echo link_to('トップ', 'homepage') ?></li>
+  <li><?php echo link_to('Symfony楽団について', 'page_show', array('slug'=>'about')) ?></li>
+  <li><?php echo link_to('お知らせ', 'news_list') ?></li>
+  <li><?php echo link_to('メンバー募集', 'page_show', array('slug'=>'joinus')) ?></li>
+  <li><?php echo link_to('お問い合わせ',  'inquiry_new') ?></li>
+</ul>
+△●●●●
+
+
+★［リスト4-37］――layout.phpを書き換える（抜粋）★
+▽●●●●
+　　：
+      <div id="header">
+        <div class="container_12">
+          <div class="grid_12">
+            <?php include_partial('global/Header') ?>
+          </div>
+          <div id="menu">
+            <div class="grid_12">
+              <?php include_partial('global/Menu') ?>
+            </div>
+          </div>
+          <div class="clear"></div>
+　　：
+      <div id="footer">
+        <div class="container_12">
+          <div class="grid_12">
+            <?php include_partial('global/Footer') ?>
+          </div>
+          <div class="clear"></div>
+　　：
+△●●●●
+
+
+★［リスト4-38］――Pageモジュールのcomponents.class.php★
+▽●●●●
+<?php
+/**
+ * Page components.
+ *
+ * @package    symfony-band
+ * @subpackage Page
+ * @author     SymfonyJapan
+ * @version    SVN: $Id: components.class.php $
+ */
+class PageComponents extends sfComponents
+{
+  /**
+   * 最新のお知らせ一覧
+   */
+  public function executeListLatestNews()
+  {
+    // カテゴリ名newsに対応するページを5件取得する
+    $this->pageList = PageTable::getInstance()->createQuery('p')
+      ->where('p.category = ?', 'news')
+      ->limit(5)
+      ->execute();
+  }
+}
+△●●●●
+
+
+★［リスト4-39］――コンポーネントのテンプレート（_ListLatestNews.php）★
+▽●●●●
+<h3>お知らせ一覧</h3>
+<?php if (count($pageList)): ?>
+  <ul>
+    <?php foreach ($pageList as $page): ?>
+      <li>
+        <?php echo $page->getDateTimeObject('created_at')->format('m/d') ?>
+        <?php echo link_to($page->getTitle(), 'news_show', array('slug'=>$page->getSlug())) ?>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+<?php else: ?>
+  お知らせはありません
+<?php endif; ?>
+△●●●●
+
+
+★［リスト4-40］――layout.phpのleftの部分を書き換える★
+▽●●●●
+            <div id="left">
+              <?php include_component('Page', 'ListLatestNews') ?>
+            </div>
+△●●●●
+
+
+★［リスト4-41］――layout.phpにスロットを用意する★
+▽●●●●
+          <div class="grid_9">
+            <div id="breadcrumb">
+              <?php include_slot('breadcrumb') ?>
+            </div>
+            <div id="right">
+△●●●●
+
+
+★［リスト4-42］――個別のテンプレートからスロットの値を設定(以下はShowSuccess.php)★
+▽●●●●
+<?php slot('breadcrumb')?>
+<?php echo link_to('Symfony楽団ホームページ', 'homepage') ?> >
+<?php echo $page->getTitle() ?>
+<?php end_slot() ?>
+△●●●●
+
+
+★［リスト4-43］――最初のInquiryForm★
+▽●●●●
+<?php
+class InquiryForm extends BaseForm
+{
+  public static $joinChoices = array(
+      1 => '希望する',
+      2 => '楽器の演奏経験はないが興味はある',
+      3 => 'いいえ',
+    );
+
+  public function configure()
+  {
+    $this->setWidgets(array(
+      'name'   => new sfWidgetFormInput(),
+      'email'  => new sfWidgetFormInput(),
+      'body'   => new sfWidgetFormTextarea(),
+      'join'   => new sfWidgetFormChoice(array(
+        'choices'  => self::$joinChoices,
+      )),
+    ));
+    $this->setValidators(array(
+      'name'   => new sfValidatorString(),
+      'email'  => new sfValidatorEmail(),
+      'body'   => new sfValidatorString(),
+      'join'   => new sfValidatorChoice(array(
+        'choices' => array_keys(self::$joinChoices),
+       )),
+    ));
+    $this->widgetSchema->setNameFormat('inquiry[%s]');
+  }
+}
+△●●●●
+
+
+★［リスト4-44］――Inquiry/Newアクションの実装★
+▽●●●●
+  public function executeNew(sfWebRequest $request)
+  {
+    $form = new InquiryForm();
+    $this->form = $form;
+  }
+△●●●●
+
+
+★［リスト4-45］――InquiryモジュールのNewSuccess.phpテンプレート★
+▽●●●●
+<?php slot('breadcrumb')?>
+<?php echo link_to('Symfony楽団ホームページ', 'homepage') ?> >
+お問い合わせ
+<?php end_slot() ?>
+<?php echo $form->renderFormTag(url_for('inquiry_new')) ?>
+<table>
+<?php echo $form; ?>
+</table>
+<input type="submit" name="submit" value="送信" />
+</form>
+△●●●●
+
+
+★［リスト4-46］――Inquiry/Newアクションの変更★
+▽●●●●
+  public function executeNew(sfWebRequest $request)
+  {
+    $form = new InquiryForm();
+    if ($request->isMethod(sfRequest::POST))
+    {
+      $form->bind($request->getParameter($form->getName()));
+      if ($form->isValid())
+      {
+        $this->redirect('Inquiry/Complete');
+      }
+    }
+    $this->form = $form;
+  }
+△●●●●
+
+
+★［リスト4-47］――Inquiry/Completeアクションを追加★
+▽●●●●
+  public function executeComplete(sfWebRequest $request)
+  {
+  }
+△●●●●
+
+
+★［リスト4-48］――InquiryモジュールのCompleteSuccess.phpテンプレート★
+▽●●●●
+<h2>お問い合わせを送信しました</h2>
+<p>Symfony楽団事務局へお問い合わせ内容を送信しました。</p>
+△●●●●
+
+
+★［リスト4-49］――完了画面用のルートをrouting.ymlに追加★
+▽●●●●
+inquiry_complete:
+  url:         /inquiry/complete
+  param:       { module: Inquiry,  action: Complete }
+△●●●●
+
+
+★［リスト4-50］――InquiryFormクラスのconfigure()メソッドでフィールドごとのラベルを設定★
+▽●●●●
+    $this->widgetSchema->setLabels(array(
+      'name'   => 'お名前',
+      'email'  => 'メールアドレス',
+      'body'   => 'お問い合わせ内容',
+      'join'   => '入団をご希望ですか？',
+    ));
+△●●●●
+
+
+★［リスト4-51］――InquryFormクラスのconfigure()メソッドでウィジェットのHTML属性とオプションを指定★
+▽●●●●
+    $this->setWidgets(array(
+      'name'   => new sfWidgetFormInput(array(
+      ), array(
+        'size'         => 30,
+        'maxlength'    => 20,
+      )),
+      'email'  => new sfWidgetFormInput(array(
+      ), array(
+        'size'         => 50,
+        'maxlength'    => 100,
+      )),
+      'body'   => new sfWidgetFormTextarea(array(
+      ), array(
+        'cols'         => 40,
+        'rows'         => 10,
+      )),
+      'join'   => new sfWidgetFormChoice(array(
+        'choices'  => self::$joinChoices,
+        'multiple' => false,
+        'expanded' => true,
+        'default'  => 3,
+      )),
+    ));
+△●●●●
+
+
+★［リスト4-52］――InquiryFormクラスのconfigure()メソッドでバリデーションルールとエラーメッセージを設定★
+▽●●●●
+    $this->setValidators(array(
+      'name'   => new sfValidatorString(array(
+        'required' => true,
+        'max_length' => 20,
+      ), array(
+        'required' => '未入力',
+        'max_length' => '20文字以内で入力してください',
+      )),
+      'email'  => new sfValidatorEmail(array(
+        'required' => true,
+      ), array(
+        'required' => '未入力',
+        'invalid'  => '正しいメールアドレスを入力してください',
+      )),
+      'body'   => new sfValidatorString(array(
+        'required' => true,
+        'max_length' => 1000,
+      ), array(
+        'required' => '未入力',
+        'max_length' => '1000文字以内で入力してください',
+      )),
+      'join'   => new sfValidatorChoice(array(
+        'choices' => array_keys(self::$joinChoices),
+        'required' => true,
+      ), array(
+        'invalid' => '無効な値です',
+        'required' => '選択してください',
+      )),
+    ));
+△●●●●
+
+
+★［リスト4-53］――SwiftMailerを使ってアクションからメールを送信する例★
+▽●●●●
+$mailer = $this->getMailer();
+$mailer->composeAndSend(
+  'fromaddress@symfony.gr.jp',
+  'someone@example.com',
+  'テストメールの件名',
+  'テストメールの本文'
+);
+△●●●●
+
+
+★［リスト4-54］――dev環境のmailerのデフォルト設定（メールは送信されない）★
+▽●●●●
+dev:
+  mailer:
+    param:
+      delivery_strategy: none
+△●●●●
+
+
+★［リスト4-55］――sendmailでメールを送信★
+▽●●●●
+  mailer:
+    param:
+      charset: 'UTF-8'
+      delivery_strategy: realtime
+      transport:
+        class: Swift_SendmailTransport
+△●●●●
+
+
+★［リスト4-56］――メール本文用のテンプレート _InquiryBody.php★
+▽●●●●
+Symfony楽団ホームページからのお問い合わせがありました。
+
+■お名前
+<?php echo $name ?>
+
+■メールアドレス
+<?php echo $email ?>
+
+■お問い合わせ内容
+<?php echo $body ?>
+
+■入団希望
+<?php echo InquiryForm::$joinChoices[$join] ?>
+△●●●●
+
+
+★［リスト4-57］――InquiryFormフォームクラスにメール送信メソッドを追加★
+▽●●●●
+  public function send(sfContext $context, $to, $subject)
+  {
+    $action = $context->getActionStack()->getLastEntry()->getActionInstance();
+
+    $body   = $action->getPartial('InquiryBody', $this->getValues());
+    $from   = $this->getValue('email');
+
+    if (isset($to) && isset($subject) && isset($body) && isset($from))
+    {
+      $mailer = $context->getMailer();
+      $mailer->composeAndSend($from, $to, $subject, $body);
+    }
+  }
+△●●●●
+
+
+★［リスト4-58］――フォームのアクションの完成版★
+▽●●●●
+  public function executeNew(sfWebRequest $request)
+  {
+    $form = new InquiryForm();
+    if ($request->isMethod(sfRequest::POST))
+    {
+      $form->bind($request->getParameter($form->getName()));
+      if ($form->isValid())
+      {
+        $form->send($this->context, 'yourname@example.com', 'Symfony楽団ホームページからの問い合わせ');
+        $this->getUser()->setAttribute('inquiry_send', true);
+        $this->redirect('Inquiry/Complete');
+      }
+    }
+    $this->form = $form;
+  }
+
+  public function executeComplete(sfWebRequest $request)
+  {
+    $user = $this->getUser();
+    $this->redirectUnless($user->getAttribute('inquiry_send'), 'Inquiry/New');
+    $user->setAttribute('inquiry_send', null);
+  }
+△●●●●
+
+
+★［リスト4-59］――adminディレクトリのbackend.phpとbackend_dev.phpのパスを修正★
+▽●●●●
+require_once(dirname(__FILE__).'/../../config/ProjectConfiguration.class.php');
+△●●●●
+
+
+★［リスト4-60］――adminディレクトリの.htaccessのRewriteBase行を修正★
+▽●●●●
+  RewriteBase /admin/
+△●●●●
+
+
+★［リスト4-61］――backendアプリケーションのsettings.ymlで国際化を有効にする★
+▽●●●●
+all:
+  .settings:
+    i18n:            true
+    default_culture: ja
+△●●●●
+
+
+★［リスト4-62］――generator.ymlでtitle項目を設定★
+▽●●●●
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Page
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          page
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+
+    config:
+      actions: ~
+      fields:  ~
+      list:
+        title:             ページの一覧
+      filter:  ~
+      form:    ~
+      edit:
+        title:             ページの編集
+      new:
+        title:             ページの新規作成
+△●●●●
+
+
+★［リスト4-63］――基本認証用の.htaccess★
+▽●●●●
+AuthType     Basic
+AuthName     "SymfonyBand Admin"
+AuthUserFile /var/www/symfony-band-etc/.htpasswd
+Require      valid-user
+△●●●●
+
+
+★［リスト4-64］――PageTableクラスに一覧取得クエリーを返すメソッドを作成★
+▽●●●●
+  public static function queryLatestNews()
+  {
+    return self::getInstance()->createQuery()
+      ->from('Page p')
+      ->where('p.category = ?', 'news')
+      ;
+  }
+△●●●●
+
+
+★［リスト4-65］――一覧の処理をページャーで行う★
+▽●●●●
+  public function executeNewsList(sfWebRequest $request)
+  {
+    $pager = new sfDoctrinePager('Page', 999);
+    $pager->setQuery(PageTable::queryLatestNews());
+    $pager->setPage(1);
+    $pager->init();
+    $this->pager = $pager;
+  }
+△●●●●
+
+
+★［リスト4-66］――PageモジュールのNewsListSuccess.phpテンプレート★
+▽●●●●
+<h2>お知らせの一覧</h2>
+<?php if ($pager->getNbResults()): ?>
+  <ul>
+    <?php foreach ($pager->getResults() as $page): ?>
+      <li>
+        <?php echo $page->getDateTimeObject('created_at')->format('m/d') ?>
+        <?php echo link_to($page->getTitle(), 'news_show',  array('slug'=>$page->getSlug())) ?>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+<?php else: ?>
+  お知らせはありません
+<?php endif; ?>
+△●●●●
+
+
+★［リスト4-67］――pageモジュールのcomponents.class.phpファイルのexecuteListLatestNews()メソッドを変更★
+▽●●●●
+  public function executeListLatestNews()
+  {
+    // カテゴリ名newsに対応するページを5件取得する
+    $pager = new sfDoctrinePager('Page', 5);
+    $pager->setQuery(PageTable::queryLatestNews());
+    $pager->setPage(1);
+    $pager->init();
+    $this->latestNewsPager = $pager;
+  }
+△●●●●
+
+
+★［リスト4-68］――コンポーネント用の_ListLatestNews.phpテンプレートを修正★
+▽●●●●
+<h3>お知らせ一覧</h3>
+<?php if ($latestNewsPager->getNbResults()): ?>
+  <ul>
+    <?php foreach ($latestNewsPager->getResults() as $page): ?>
+      <li>
+        <?php echo $page->getDateTimeObject('created_at')->format('m/d') ?>
+        <?php echo link_to($page->getTitle(), 'news_show', array('slug'=>$page->getSlug())) ?>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+<?php else: ?>
+  お知らせはありません
+<?php endif; ?>
+△●●●●
+
+

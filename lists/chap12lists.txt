@@ -1,0 +1,288 @@
+第12章のリスト
+===============================================================================
+
+★［リスト12-1］――opApplicationConfiguration::getControllerDirs()の内容★
+▽●●●●
+public function getControllerDirs($moduleName)
+{
+  $dirs = array();
+  $dirs = array_merge($dirs, $this->globEnablePlugin('/apps/'.sfConfig::get('sf_app').'/modules/'.$moduleName.'/actions', true));
+  $dirs = array_merge($dirs, parent::getControllerDirs($moduleName));
+  return $dirs;
+}
+△●●●●
+
+
+★［リスト12-2］――opExecutionFilter::notifyPostExecuteActionEvent()の実装★
+▽●●●●
+public static function notifyPostExecuteActionEvent($subject, sfEventDispatcher $dispatcher, sfAction $actionInstance, $result)
+{
+  $moduleName = $actionInstance->getModuleName();
+  $actionName = $actionInstance->getActionName();
+  $params = array(
+    'moduleName'     => $moduleName,
+    'actionName'     => $actionName,
+    'actionInstance' => $actionInstance,
+    'result'         => $result,
+  );
+  $dispatcher->notify(new sfEvent($subject, 'op_action.post_execute_'.$moduleName.'_'.$actionName, $params));
+  $dispatcher->notify(new sfEvent($subject, 'op_action.post_execute', $params));
+}
+△●●●●
+
+
+★［リスト12-3］――opFrontWebController::redirect()の実装★
+▽●●●●
+public function redirect($url, $delay = 0, $statusCode = 302)
+{
+  $actionInstance = $this->context->getActionStack()->getLastEntry()->getActionInstance();
+  $result = sfView::SUCCESS;
+  if ($this->context->getUser()->hasFlash('error'))
+  {
+    $result = sfView::ERROR;
+  }
+  opExecutionFilter::notifyPostExecuteActionEvent($this, $this->dispatcher, $actionInstance, $result);
+  parent::redirect($url, $delay, $statusCode);
+}
+△●●●●
+
+
+★［リスト12-4］――opAshiatoPluginのconfig.php★
+▽●●●●
+<?php
+$this->dispatcher->connect(
+  'op_action.post_execute_member_profile',
+  array('opRegisterAshiato', 'listenToPostActionEventRetriveMemberById')
+);
+
+$this->dispatcher->connect(
+  'op_action.post_execute_friend_list',
+  array('opRegisterAshiato', 'listenToPostActionEventRetriveMemberById')
+);
+
+$this->dispatcher->connect(
+  'op_action.post_execute_diary_show',
+  array('opRegisterAshiato', 'listenToPostActionEventRetriveMemberByDiary')
+);
+
+$this->dispatcher->connect(
+  'op_action.post_execute_diary_listMember',
+  array('opRegisterAshiato', 'listenToPostActionEventRetriveMemberById')
+);
+△●●●●
+
+
+★［リスト12-5］――mobile_address.ymlの内容★
+▽●●●●
+- docomo.ne.jp
+- ezweb.ne.jp
+- softbank.ne.jp
+- d.vodafone.ne.jp
+- h.vodafone.ne.jp
+- t.vodafone.ne.jp
+- c.vodafone.ne.jp
+- r.vodafone.ne.jp
+- k.vodafone.ne.jp
+- n.vodafone.ne.jp
+- q.vodafone.ne.jp
+- s.vodafone.ne.jp
+- pdx.ne.jp
+- di.pdx.ne.jp
+- dj.pdx.ne.jp
+- dk.pdx.ne.jp
+- wm.pdx.ne.jp
+- disney.ne.jp
+- willcom.com
+△●●●●
+
+
+★［リスト12-6］――openpne:install中のDBMSの入力を求める部分のコード★
+▽●●●●
+$validator = new sfValidatorCallback(array('required' => true, 'callback' => array($this, 'validateDBMS')));
+$dbms = $this->askAndValidate(array('Choose DBMS:', '- mysql', '- pgsql (unsupported)', '- sqlite (unsupported)'), $validator, array('style' => 'QUESTION_LARGE'));
+if (!$dbms)
+{
+  $this->logSection('installer', 'task aborted');
+
+  return 1;
+}
+△●●●●
+
+
+★［リスト12-7］――Zend_Aclと連携したモデルに関する権限チェックの例★
+▽●●●●
+<?php
+// $member が $obj に対する閲覧権限を持っている場合のみ表示
+if ($obj->isAllowed($member, 'view'))
+{
+  // ...
+}
+
+// $member が $obj に対する編集権限を持っている場合のみ表示
+if ($obj->isAllowed($member, 'edit'))
+{
+  // ...
+}
+△●●●●
+
+
+★［リスト12-8］――opDynamicAclRouteを利用した権限チェック付きのルーティング設定の例★
+▽●●●●
+# obj を表示するアクション
+obj_show:
+  url:     /obj/:id
+  class:   opDynamicAclRoute
+  options: { model: Obj, type: object, privilege: view }  # Obj に対する閲覧権限を持っている場合のみ表示
+  param:   { module: obj, action: show }
+  requirements:
+    id:        \d+
+    sf_method: [get]
+
+# obj を編集するアクション
+obj_edit:
+  url:     /obj/edit/:id
+  class:   opDynamicAclRoute
+  options: { model: Obj, type: object, privilege: edit }  # Obj に対する編集権限を持っている場合のみ表示
+  param:   { module: obj, action: show }
+  requirements:
+    id:        \d+
+    sf_method: [get]
+△●●●●
+
+
+★［リスト12-9］――Community::generateRoleId()の例（抜粋）★
+▽●●●●
+public function generateRoleId(Member $member)
+{
+  if (Doctrine::getTable('CommunityMember')->isAdmin($member->id, $this->id))
+  {
+    return 'admin';
+  }
+
+    // :
+
+  return 'everyone';
+}
+△●●●●
+
+
+★［リスト12-10］――CommunityTable::appendRoles()メソッドの例（抜粋）★
+▽●●●●
+public function appendRoles(Zend_Acl $acl)
+{
+  return $acl
+    ->addRole(new Zend_Acl_Role('everyone'))
+    ->addRole(new Zend_Acl_Role('member'), 'everyone')  // 会員は非会員の権限を継承する
+    ->addRole(new Zend_Acl_Role('admin'), 'member'); // 管理者は会員の権限を継承する
+}
+△●●●●
+
+
+★［リスト12-11］――CommunityTable::appendRules()メソッドの例（抜粋）★
+▽●●●●
+public function appendRules(Zend_Acl $acl, $resource = null)
+{
+  // $resource はこのモデルのクラスインスタンス
+  return $acl
+    ->allow('everyone', $resource, 'view') // everyone は $resource に対して閲覧権限を有する
+    ->allow('admin', $resource, 'edit');   // admin は $resource に対して編集権限を有する
+}
+△●●●●
+
+
+★［リスト12-12］――openpne:execute-mail-actionの内容（抜粋）★
+▽●●●●
+$stdin = file_get_contents('php://stdin');
+$message = new opMailMessage(array('raw' => $stdin));
+opMailRequest::setMailMessage($message);
+
+$configuration = ProjectConfiguration::getApplicationConfiguration('mobile_mail_frontend', 'prod', false);
+$context = sfContext::createInstance($configuration);
+
+$context->getController()->dispatch();
+△●●●●
+
+
+★［リスト12-13］――mobile_mail_frontendのrouting.ymlの内容（抜粋）★
+▽●●●●
+community_add_image:
+  url: c.:id
+  class: opMailRoute
+  param: { module: community, action: image }
+  required: { id: \d+ }
+△●●●●
+
+
+★［リスト12-14］――mobile_mail_frontendのcommunity/imageアクションの内容（抜粋）★
+▽●●●●
+public function executeImage(sfWebRequest $request)
+{
+  // :
+
+  $community = Doctrine::getTable('Community')->find($request->getParameter('id'));
+  if (!$community)
+  {
+    return sfView::ERROR;
+  }
+
+  // :
+
+  $message = $request->getMailMessage();
+  if ($images = $message->getImages())
+  {
+    $image = array_shift($images);
+
+    $validator = new opValidatorImageFile();
+    $validFile = $validator->clean($image);
+
+    $file = new File();
+    $file->setFromValidatedFile($validFile);
+    $file->setName('c_'.$community->getId().'_'.$file->getName());
+
+    $community->setFile($file);
+    $community->save();
+  }
+
+  return sfView::NONE;
+}
+△●●●●
+
+
+★［リスト12-15］――app_url_for()ヘルパーの使用例★
+▽●●●●
+echo app_url_for('pc_frontend', '@homepage', true);  // pc_frontendの@homepageへの絶対URLを出力する
+△●●●●
+
+
+★［リスト12-16］――mobile_frontendアプリケーションのmemberActions::executeSearch()メソッド★
+▽●●●●
+// opMemberAction を継承したアクションクラス。opMemberAction は通常のアクションクラスと同様に sfActions を継承している
+class memberActions extends opMemberAction
+{
+  // :
+  public function executeSearch($request)
+  {
+    $this->size = 10; // 携帯電話向けにページャのサイズを変更する
+
+    return parent::executeSearch($request);
+  }
+}
+△●●●●
+
+
+★［リスト12-17］――opWebRequest::getGetParameters()メソッドでのヌル文字の除去★
+▽●●●●
+public function getGetParameters($isStripNullbyte = true)
+{
+  if ($isStripNullbyte)
+  {
+    return opToolkit::stripNullByteDeep(parent::getGetParameters());
+  }
+  else
+  {
+    return parent::getGetParameters();
+  }
+}
+△●●●●
+
+

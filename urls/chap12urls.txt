@@ -1,0 +1,31 @@
+第12章のURL
+===============================================================================
+
+
+★P394
+OpenPNE 公式サイト	http://www.openpne.jp/
+
+OpenPNE Issue Tracking System
+http://redmine.openpne.jp/
+
+
+★P395
+Apache License, Version 2.0（原文）
+http://www.apache.org/licenses/LICENSE-2.0.html
+
+licenses/Apache_License_2.0 - Open Source Group Japan Wiki - SourceForge.JP（Apache License 2.0 の日本語参考訳）
+http://sourceforge.jp/projects/opensource/wiki/licenses%2FApache_License_2.0
+
+Apache License - Wikipedia
+http://ja.wikipedia.org/wiki/Apache_License
+
+
+OpenPNEダウンロードページ
+http://www.openpne.jp/pne-downloads/
+
+
+★P412
+Zend Framework: Documentation: Zend_Acl - Zend Framework Manual
+http://framework.zend.com/manual/ja/zend.acl.html
+
+

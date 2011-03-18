@@ -1,0 +1,71 @@
+第8章のコマンド
+===============================================================================
+
+★P285
+php symfony plugin:install sfDoctrineGuardPlugin
+
+
+php symfony doctrine:build-model
+php symfony doctrine:build-forms
+php symfony doctrine:build-filters
+php symfony doctrine:build-sql
+php symfony doctrine:insert-sql
+
+
+★P286
+php symfony doctrine:data-load data/fixtures/guard.yml
+
+
+★P289
+php symfony plugin:install sfFormExtraPlugin
+
+
+★P293
+php symfony plugin:install sfFeed2Plugin
+
+
+★P295
+php symfony plugin:install sfJqueryReloadedPlugin
+
+
+php symfony plugin:publish-assets
+
+
+★P298
+php symfony plugin:install sfImageTransformPlugin
+
+
+★P300
+svn checkout http://smarty-php.googlecode.com/svn/trunk lib/vendor/smarty
+
+
+svn checkout http://svn.symfony-project.com/plugins/sfSmartyPlugin/trunk plugins/sfSmartyPlugin
+
+
+★P302
+php symfony plugin:install sfTaskExtraPlugin
+
+
+★P303
+php symfony generate:plugin sfHelloWorldPlugin
+
+
+★P304
+php symfony plugin:install sDoctrineMasterSlavePlugin
+
+
+★P305
+php symfony plugin:install sfWebBrowserPlugin
+
+
+★P306
+php symfony plugin:install sfThumbnailPlugin
+
+
+★P307
+php symfony plugin:add-channel openpear.org
+php symfony plugin:install openpear.org/jpSimpleMailPlugin
+
+
+
+

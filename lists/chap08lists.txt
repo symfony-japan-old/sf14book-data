@@ -1,0 +1,445 @@
+第8章のリスト
+===============================================================================
+
+★［リスト8-1］――config/ProjectConfiguration.class.php★
+▽●●●●
+class ProjectConfiguration extends sfProjectConfiguration
+{
+  public function setup()
+  {
+    // sfDocgrineGuardPluginとsfFormExtraPluginを有効にする
+    $this->enablePlugins(array(
+                        'sfDoctrinePlugin',
+                        'sfDoctrineGuardPlugin',
+                        'sfFormExtraPlugin',
+                        ));
+  }
+}
+△●●●●
+
+
+★［リスト8-2］――管理ユーザーを登録するfixture★
+▽●●●●
+sfGuardUser:
+  User_admin:
+    first_name:     John
+    last_name:      Doe
+    email_address:  john.doe@gmail.com
+    username:       admin
+    password:       admin
+    is_super_admin: true
+    Groups:         [Group_admin]
+
+sfGuardGroup:
+  Group_admin:
+    name:           admin
+    description:    Administrator group
+    Permissions:    [Permission_admin]
+
+sfGuardPermission:
+  Permission_admin:
+    name:           admin
+    description:    Administrator permission
+△●●●●
+
+
+★［リスト8-3］――frontendでsfDoctrineGuardPluginのログイン用モジュールを有効にする★
+▽●●●●
+all:
+  .settings:
+    enabled_modules:   [default, sfGuardAuth]
+△●●●●
+
+
+★［リスト8-4］――backendでsfDoctrineGuardPluginの管理用モジュールを有効にする★
+▽●●●●
+all:
+  .settings:
+    enabled_modules:    [default, sfGuardAuth, sfGuardGroup, sfGuardUser, sfGuardPermission]
+△●●●●
+
+
+★［リスト8-5］――ログイン要求、権限要求時のモジュールとアクションを設定★
+▽●●●●
+    login_module:    sfGuardAuth
+    login_action:    signin
+
+    secure_module:   sfGuardAuth
+    secure_action:   secure
+△●●●●
+
+
+★［リスト8-6］――backendアプリケーションでセキュリティ設定を有効にする★
+▽●●●●
+all:
+  is_secure:   true
+△●●●●
+
+
+★［リスト8-7］――myUserクラスの継承元をsfGuardSecurityUserに変更★
+▽●●●●
+class myUser extends sfGuardSecurityUser
+{
+}
+△●●●●
+
+
+★［リスト8-8］――アクションで認証ユーザーのユーザー名を取得する★
+▽●●●●
+    $username = $this->getUser()->getGuardUser()->getUserName();
+△●●●●
+
+
+★［リスト8-9］――reCAPTCHA認証のあるコメントフォーム★
+▽●●●●
+<?php
+class ReCaptchaForm extends sfForm
+{
+  public function configure()
+  {
+    //  ウィジェットを設定する
+    $this->setWidgets(array(
+      'name'    => new sfWidgetFormInput(),
+      'comment' => new sfWidgetFormTextarea(),
+      'captcha' => new sfWidgetFormReCaptcha(array(
+        'public_key' => '------取得した公開鍵------'
+      ))
+    ));
+
+    //  バリデータを設定する
+    $this->setValidators(array (
+      'name'    => new sfValidatorString(),
+      'comment' => new sfValidatorString(),
+      'captcha' => new sfValidatorReCaptcha(array(
+        'private_key' => '------取得した秘密鍵------'
+      ))
+    ));
+
+    $this->widgetSchema->setNameFormat('recaptcha[%s]');
+  }
+}
+△●●●●
+
+
+★［リスト8-10］――commentモジュールのNewアクション★
+▽●●●●
+  public function executeNew(sfWebRequest $request)
+  {
+    $form = new ReCaptchaForm();
+    if ($request->isMethod(sfRequest::POST)
+    {
+      // reCAPTCHAウィジェットの初期化キーを取得して入力値にマージする
+      $taintedValues = array_merge(
+        $request->getParameter($form->getName()),
+        array(
+          'recaptcha_challenge_field' => $request->getParameter('recaptcha_challenge_field'),
+          'recaptcha_response_field'  => $request->getParameter('recaptcha_response_field'),
+        ),
+      );
+
+      $form->bind($taintedValues);
+      if ($form->isValid())
+      {
+        // OK
+      }
+    }
+    $this->form = $form;
+  }
+}
+△●●●●
+
+
+★［リスト8-11］――commentモジュールのnewSuccess.phpテンプレート★
+▽●●●●
+<?php echo $form->renderFormTag(url_for('comment/New')) ?>
+<table>
+<?php echo $form ?>
+</table>
+<input type="submit" name="test" value="test">
+</form>
+△●●●●
+
+
+★［リスト8-12］――createFromWeb()メソッドでフィードを読み込む★
+▽●●●●
+  $feed = sfFeedPeer::createFromWeb('http://www.symfony.gr.jp/feed');
+△●●●●
+
+
+★［リスト8-13］――読み込んだフィード情報を出力★
+▽●●●●
+  foreach ($feed->getItems() as $feedItem)
+  {
+    echo $feedItem->getTitle() . PHP_EOL;
+    echo $feedItem->getLink() . PHP_EOL;
+  }
+△●●●●
+
+
+★［リスト8-14］――アクションでsfFeedオブジェクトを組み立てる例（TestモジュールのFeedアクション）★
+▽●●●●
+  public function executeFeed(sfWebRequest $request)
+  {
+    $feed = sfFeedPeer::newInstance('atom1');
+    $feed->initialize(array(
+      'title'       => 'Symfony楽団ホームページ更新情報',
+      'link'        => 'http://www.symfony-gakudan.jp/',
+      'authorEmail' => 'info@symfony-gakudan.jp',
+      'authorName'  => 'Symfony Admin',
+    ));
+
+    $pubDate = new DateTime();
+    $item = new sfFeedItem();
+    $item->setTitle('記事のタイトル');
+    $item->setLink('http://www.symfony-gakudan.jp/page/about');
+    $item->setAuthorName('Symfony Admin');
+    $item->setPubdate($pubDate->format('U'));
+    $item->setUniqueId('about');
+    $item->setDescription('記事の本文');
+
+    $feed->addItem($item);
+
+    $this->feed = $feed;
+  }
+△●●●●
+
+
+★［リスト8-15］――sfFeedオブジェクトをXML形式で出力するテンプレート（FeedSuccess.phpテンプレート）★
+▽●●●●
+<?php decorate_with(false) ?>
+<?php echo $feed->asXml(ESC_RAW) ?>
+△●●●●
+
+
+★［リスト8-16］――settings.ymlでプラグインが利用するjQueryのファイルを設定★
+▽●●●●
+all:
+  .settings:
+    jquery_core:    jquery-1.4.2.min.js
+△●●●●
+
+
+★［リスト8-17］――settings.ymlでjsディレクトリとjQueryのファイルを設定★
+▽●●●●
+all:
+  .settings:
+    jquery_web_dir: js
+    jquery_core:    jquery-1.4.2.min.js
+△●●●●
+
+
+★［リスト8-18］――settings.ymlでjQueryのURLを設定★
+▽●●●●
+all:
+  .settings:
+    jquery_path:    https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js　　
+△●●●●
+
+
+★［リスト8-19］――テンプレートでjQueryヘルパーを有効にする★
+▽●●●●
+<?php use_helper('jQuery') ?>
+△●●●●
+
+
+★［リスト8-20］――アプリケーション全体でjQueryヘルパーを有効にするためにsettings.ymlを変更★
+▽●●●●
+all:
+  .settings:
+    standard_helpers:       [Partial, Cache, jQuery]
+△●●●●
+
+
+★［リスト8-21］――jQueryヘルパーを使ってフォームのデータをAjaxで送信する例★
+▽●●●●
+<?php use_helper('jQuery') ?>
+<?php jq_javascript_tag() ?>
+function loading() {
+    $('#response').html('<?php echo image_tag("ajax-loader.gif") ?>');
+}
+<?php jq_end_javascript_tag() ?>
+<form>
+<?php echo $form ?>
+<?php echo jq_submit_to_remote('テスト', 'test', array(
+        'update' => array(
+            'success' => 'response',
+        ),
+        'loading' => 'loading();',
+        'url'=>'hello/ajax')) ?>
+</form>
+<div id="response"></div>
+△●●●●
+
+
+★［リスト8-22］――app.ymlでsfImageTransformPluginの動作を設定★
+▽●●●●
+all:
+  sfImageTransformPlugin:
+    default_adapter: GD # GDまたはImageMagick
+    default_image:
+      mime_type: image/png
+      filename: Untitled.png
+      width: 100
+      height: 100
+      color: '#FFFFFF'
+    font_dir: /usr/share/fonts/truetype/msttcorefonts
+    mime_type:
+      auto_detect: false
+      library: gd_mime_type #  gd_mime_type (GD), Fileinfo (PECL), MIME_Type (PEAR)
+△●●●●
+
+
+★［リスト8-23］――sfImageオブジェクトの初期化★
+▽●●●●
+    $image = new sfImage('path/to/image.png', 'image/png');
+△●●●●
+
+
+★［リスト8-24］――sfImageTransformPluginのsfImageクラスを使う例★
+▽●●●●
+    $image = new sfImage('path/to/image.png');
+    $image->resize(100,100)
+      ->saveAs('path/to/image2.png');
+△●●●●
+
+
+★［リスト8-25］――ProjectConfiguration.class.phpに追加★
+▽●●●●
+    $this->enablePlugins('sfSmartyPlugin');
+△●●●●
+
+
+★［リスト8-26］――app.ymlでSmartyのライブラリ位置や拡張子などを設定★
+▽●●●●
+all:
+  sfSmarty:
+    class_path: lib/vendor/smarty
+    template_extension: .tpl
+    template_security: false
+△●●●●
+
+
+★［リスト8-27］――module.ymlでビュークラスをsfSmartyに設定★
+▽●●●●
+default:
+  view_class: sfSmarty
+△●●●●
+
+
+★［リスト8-28］――Smartyレンダリング用のレイアウトテンプレートlayout.tpl★
+▽●●●●
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    {include_http_metas}
+    {include_metas}
+    {include_title}
+    <link rel="shortcut icon" href="/favicon.ico" />
+    {include_stylesheets}
+    {include_javascripts}
+  </head>
+  <body>
+    {$sf_content}
+  </body>
+</html>
+△●●●●
+
+
+★［リスト8-29］――indexSuccess.tpl★
+▽●●●●
+<p>{$name}</p>
+<p>{$sf_user->getAttribute('test')}</p>
+<ul>
+  {foreach from=$users item=$user}
+    <li>{$user->getFirstName()}</li>
+  {/foreach}
+</ul>
+△●●●●
+
+
+★［リスト8-30］――sfWebBrowserクラスを使う★
+▽●●●●
+    $browser = new sfWebBrowser();
+    $browser->get('http://www.symfony.gr.jp/');
+    $data = $browser->getResponseText();
+△●●●●
+
+
+★［リスト8-31］――sfThumbnailクラスの使い方★
+▽●●●●
+    $thumbnail = new sfThumbnail(100, 100);
+    $thumbnail->loadFile('/path/to/image.png');
+    $thumbnaik->save('/path/to/image2.jpg', 'image/jpg');
+△●●●●
+
+
+★［リスト8-32］――jpSimpleMailPluginを有効にする★
+▽●●●●
+class ProjectConfiguration extends sfProjectConfiguration
+{
+  public function setup()
+  {
+    $this->enablePlugins('jpSimpleMailPlugin');
+  }
+}
+△●●●●
+
+
+★［リスト8-33］――factories.ymlでメール配送に関する設定を追加★
+▽●●●●
+all:
+  //：
+  mailer:
+    param:
+      delivery_strategy: realtime
+      transport:
+        class: Swift_SendmailTransport
+△●●●●
+
+
+★［リスト8-34］――dev環境でメールを配信しないようにしている設定（ここでは削除する）★
+▽●●●●
+dev:
+  mailer:
+    param:
+      delivery_strategy: none
+△●●●●
+
+
+★［リスト8-35］――jpSimpleMailPluginを使ってメールを送る★
+▽●●●●
+  public function sendMail()
+  {
+    $mailer = jpSimpleMail::create('SwiftMailer4');
+    $mailer->setSubject('メール送信テストです');
+    $mailer->setSender('foo@symfony.gr.jp');
+    $mailer->addTo(sprintf('%s <%s>', 'symfony 太郎', 'bar@symfony.gr.jp'));
+    $mailer->setFrom(sprintf('%s <%s>', 'symfony 花子', 'foo@symfony.gr.jp'));
+    $mailer->setBody('メールの本文がここに入ります');
+    $mailer->send();
+  }
+△●●●●
+
+
+★［リスト8-36］――config/[プラグイン名]Configuration.class.php★
+▽●●●●
+class [プラグイン名]Configuration extends sfPluginConfiguration
+{
+  /**
+   * @see sfPluginConfiguration
+   */
+  public function initialize()
+  {
+  }
+}
+△●●●●
+
+
+★［リスト8-37］――config/settings.yml★
+▽●●●●
+all:
+  .settings:
+    # sfGuardAuthモジュールを有効にする
+    enabled_modules: [default, sfGuardAuth]
+△●●●●
+

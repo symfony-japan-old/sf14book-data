@@ -1,0 +1,259 @@
+第10章のリスト
+===============================================================================
+
+★［リスト10-1］――レプリケーションのマスター用の設定★
+▽●●●●
+[mysqld]
+log-bin = mysql-bin
+server-id = 1
+△●●●●
+
+
+★［リスト10-2］――my_slave.cnfをスレーブ用に変更する★
+▽●●●●
+[mysqld]
+socket    = /tmp/mysql_slave.sock
+pid-file  = /var/run/mysql_slave.pid
+innodb_data_home_dir      = /var/lib/mysql_slave/
+innodb_log_group_home_dir = /var/lib/mysql_slave/
+server-id = 2
+△●●●●
+
+
+★［リスト10-3］――ProjectConfiguration.class.phpでプラグインの読み込み順を変更★
+▽●●●●
+class ProjectConfiguration extends sfProjectConfiguration
+{
+    public function setup()
+    {
+        $this->enablePlugins('sfDoctrineMasterSlavePlugin');
+        $this->enablePlugins('sfDoctrinePlugin');
+    }
+}
+△●●●●
+
+
+★［リスト10-4］――databases.yml★
+▽●●●●
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/07-Databases
+
+all:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn:      mysql:host=localhost;dbname=sfmasterslave
+      username: root
+      password: ~
+      is_master: true
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_unicode_ci
+  slave:
+    class: sfDoctrineDatabase
+    param:
+      dsn:      mysql:host=127.0.0.1;dbname=sfmasterslave;port=53306
+      username: root
+      password: ~
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_unicode_ci
+△●●●●
+
+
+★［リスト10-5］――テスト用のアクションの実装★
+▽●●●●
+<?php
+
+/**
+ * Page actions.
+ *
+ * @package    sfmasterslave
+ * @subpackage Page
+ * @author     symfony developper
+ * @version    SVN: $Id: actions.class.php 23810 2009-11-12 11:07:44Z Kris.Wallsmith $
+ */
+class PageActions extends sfActions
+{
+  /**
+   * 一覧
+   */
+  public function executeIndex(sfWebRequest $request)
+  {
+    $this->pages = PageTable::getInstance()->findAll();
+  }
+  /**
+   * データの追加
+   */
+  public function executeAdd(sfWebRequest $request)
+  {
+    $page = PageTable::getInstance()->getRecord();
+    $page->setTitle("テスト")
+         ->setBody("テスト")
+         ->setCategory("テスト")
+         ->save();
+  }
+  /**
+   * データの更新
+   */
+  public function executeUpdate(sfWebRequest $request)
+  {
+    $this->id = $request->getParameter('id');
+    if ($page = PageTable::getInstance()->find($this->id)) {
+      $page->setTitle($page->getTitle() . '!')
+           ->save();
+    }
+  }
+  /**
+   * データの削除
+   */
+  public function executeDelete(sfWebRequest $request)
+  {
+    $this->id = $request->getParameter('id');
+    if ($page = PageTable::getInstance()->find($this->id)) {
+      $page->delete();
+    }
+  }
+  /**
+   * マスターを参照した一覧
+   */
+  public function executeMasterList(sfWebRequest $request)
+  {
+    $conn = PageTable::getInstance()->getConnection();
+    $conn->beginTransaction();
+    $this->pages = PageTable::getInstance()->findAll();
+    $conn->commit();
+
+    $this->setTemplate("Index");
+  }
+}
+△●●●●
+
+
+★［リスト10-6］――routing.ymlを編集★
+▽●●●●
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/10-Routing
+
+homepage:
+  url:   /
+  param: { module: Page, action: Index }
+
+add:
+  url:   /add
+  param: { module: Page, action: Add }
+
+update:
+  url:   /update/:id
+  param: { module: Page, action: Update }
+  requirements:
+    id: \d+
+
+delete:
+  url:   /delete/:id
+  param: { module: Page, action: Delete }
+  requirements:
+    id: \d+
+
+master_list:
+  url:   /master
+  param: { module: Page, action: MasterList }
+△●●●●
+
+
+★［リスト10-7］――apps/frontend/modules/Page/templates/IndexSuccess.php★
+▽●●●●
+<?php include_partial("Navi") ?>
+<br />
+<table id="list">
+<thead>
+  <tr>
+    <th>タイトル</th>
+    <th>作成日時</th>
+    <th>更新日時</th>
+    <th>操作</th>
+  </tr>
+</thead>
+<tfoot>
+  <tr>
+    <td colspan="4"><?php echo link_to("追加", "@add") ?></td>
+  </tr>
+</tfoot>
+<tbody>
+<?php foreach ($pages as $page): ?>
+  <tr>
+    <td><?php echo $page->getTitle() ?></td>
+    <td><?php echo $page->getCreatedAt() ?></td>
+    <td><?php echo $page->getUpdatedAt() ?></td>
+    <td>
+      <ul class="navi">
+        <li><?php echo link_to("更新", "@update?id={$page->getId()}") ?></li>
+        <li><?php echo link_to("削除", "@delete?id={$page->getId()}", array("confirm" => "削除してもよろしいですか？")) ?></li>
+      </ul>
+    </td>
+  </tr>
+<?php endforeach ?>
+</tbody>
+</table>
+△●●●●
+
+
+★［リスト10-8］――apps/frontend/modules/Page/templates/AddSuccess.php★
+▽●●●●
+<?php include_partial("Navi") ?>
+<p>データを追加しました。</p>
+△●●●●
+
+
+★［リスト10-9］――apps/frontend/modules/Page/templates/UpdateSuccess.php★
+▽●●●●
+<?php include_partial("Navi") ?>
+<p>ID: <?php echo $id ?>を更新しました。</p>
+△●●●●
+
+
+★［リスト10-10］――apps/frontend/modules/Page/templates/DeleteSuccess.php★
+▽●●●●
+<?php include_partial("Navi") ?>
+<p>ID: <?php echo $id ?>を削除しました。</p>
+△●●●●
+
+
+★［リスト10-11］――apps/frontend/modules/Page/templates/_Navi.php★
+▽●●●●
+<ul class="navi">
+  <li><?php echo link_to("一覧へ", "@homepage") ?></li>
+  <li><?php echo link_to("マスター一覧へ", "@master_list") ?></li>
+</ul>
+△●●●●
+
+
+★［リスト10-12］――web/css/main.css★
+▽●●●●
+@charset "UTF-8";
+
+table {
+    border-collapse: collapse;
+}
+
+#list tbody td {
+    border: 1px #000000 solid;
+    padding: 5px;
+}
+
+#list tfoot td {
+    padding: 5px 0px;
+}
+
+.navi {
+    list-style-type: none;
+    padding: 0px 5px;
+    margin: 0px;
+}
+
+.navi li {
+    display: inline;
+}
+△●●●●
+
+

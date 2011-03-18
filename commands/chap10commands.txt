@@ -1,0 +1,70 @@
+第10章のコマンド
+===============================================================================
+
+★P350
+mysql -u root -h localhost
+mysql> CREATE USER 'repl'@'localhost' IDENTIFIED BY 'slavepass';
+mysql> GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost' IDENTIFIED BY 'slavepass';
+mysql> FLUSH PRIVILEGES;
+
+
+★P351
+mysql> FLUSH TABLES WITH READ LOCK;
+mysql> SHOW MASTER STATUS;
+
+
+cd /var/lib
+sudo cp -a mysql mysql_slave
+mysql -u root -h localhost
+mysql> UNLOCK TABLES;
+mysql> exit
+
+
+sudo cp -a /etc/mysql/my.cnf /etc/mysql/my_slave.cnf
+
+
+★P352
+sudo -u mysql mysqld_safe --defaults-file=/etc/mysql/my_slave.cnf --datadir=/var/lib/mysql_slave --pid-file=/var/run/mysql_slave.pid --port=53306 &
+
+
+mysql -u root -h 127.0.0.1 -P 53306
+mysql> STOP SLAVE;
+mysql> CHANGE MASTER TO
+    -> MASTER_HOST = 'localhost',
+    -> MASTER_PORT = 3306,
+    -> MASTER_USER = 'repl',
+    -> MASTER_PASSWORD = 'slavepass',
+    -> MASTER_LOG_FILE = 'mysql-bin.000003',
+    -> MASTER_LOG_POS = 487;
+mysql> START SLAVE;
+mysql> SHOW SLAVE STATUS\G
+
+
+★P354
+php symfony plugin:install sfDoctrineMasterSlavePlugin
+
+
+★P356
+cp /var/www/symfony-band/config/doctrine/schema.yml /var/www/sfmasterslave/config/doctrine/schema.yml
+
+
+cp /var/www/symfony-band/data/fixtures/* /var/www/sfmasterslave/data/fixtures/
+
+
+php symfony doctrine:build-db doctrine
+
+
+★P357
+php symfony doctrine:build --all-classes
+php symfony doctrine:create-model-tables Page
+
+
+php symfony doctrine:data-load
+
+
+php symfony generate:module frontend Page
+
+
+
+
+

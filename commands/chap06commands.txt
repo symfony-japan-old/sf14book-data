@@ -1,0 +1,19 @@
+第6章のコマンド
+===============================================================================
+
+★P215
+php symfony doctrine:build --all
+
+
+★P224
+php symfony doctrine:dql "FROM Article WHERE title Like ?" "%symfony%"
+
+
+★P244
+php symfony doctrine:data-load
+
+
+select * from article_tag;
+
+
+

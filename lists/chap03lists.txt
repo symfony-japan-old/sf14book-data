@@ -1,0 +1,131 @@
+第3章のリスト
+===============================================================================
+
+★［リスト3-1］――index.php★
+▽●●●●
+require_once(dirname(__FILE__).'/../config/ProjectConfiguration.class.php');  // （1）
+
+$configuration = ProjectConfiguration::getApplicationConfiguration('frontend', 'prod', false);
+sfContext::createInstance($configuration)->dispatch();
+△●●●●
+
+
+★［リスト3-2］――ProjectConfiguration.class.php★
+▽●●●●
+require_once dirname(__FILE__).'/../lib/vendor/symfony/lib/autoload/sfCoreAutoload.class.php'; // （2）
+sfCoreAutoload::register();
+
+class ProjectConfiguration extends sfProjectConfiguration
+{
+  public function setup()
+  {
+    $this->enablePlugins('sfDoctrinePlugin');
+  }
+}
+△●●●●
+
+
+★［リスト3-3］――DocumentRootの変更★
+▽●●●●
+DocumentRoot /var/www/sf14/web
+△●●●●
+
+
+★［リスト3-4］――バーチャルホストのDocumentRootの変更★
+▽●●●●
+<VirtualHost *:80>
+    ServerName   sf14.localhost
+    DocumentRoot /var/www/sf14/web
+</VirtualHost>
+△●●●●
+
+
+★［リスト3-5］――index.php★
+▽●●●●
+require_once(dirname(__FILE__).'/../../sf14/config/ProjectConfiguration.class.php');
+△●●●●
+
+
+★［リスト3-6］――index.php★
+▽●●●●
+require_once(dirname(__FILE__).'/../../../sf14/config/ProjectConfiguration.class.php');
+△●●●●
+
+
+★［リスト3-7］――.htaccess★
+▽●●●●
+  RewriteBase /catalog/
+△●●●●
+
+
+★［リスト3-8］――index.php★
+▽●●●●
+require_once(dirname(__FILE__).'/../system/config/ProjectConfiguration.class.php');
+△●●●●
+
+
+★［リスト3-9］――systemディレクトリの.htaccess★
+▽●●●●
+Deny from all
+△●●●●
+
+
+★［リスト3-10］――settings.ymlでエラーページ用のモジュールとアクションを設定★
+▽●●●●
+all:
+  .actions:
+    error_404_module:       hello
+    error_404_action:       error404
+△●●●●
+
+
+★［リスト3-11］――executeError404()メソッド★
+▽●●●●
+  public function executeError404()
+  {
+  }
+△●●●●
+
+
+★［リスト3-12］――error404Success.phpテンプレートファイル★
+▽●●●●
+指定されたページは存在しません
+△●●●●
+
+
+★［リスト3-13］――factories.ymlでセッションストレージの設定を変更★
+▽●●●●
+  storage:
+    class: sfSessionStorage
+    param:
+      session_name: session
+△●●●●
+
+
+★［リスト3-14］――.htaccessで拡張子付きのリクエストはApacheで処理するように変更★
+▽●●●●
+Options +FollowSymLinks +ExecCGI
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # uncomment the following line, if you are having trouble
+  # getting no_script_name to work
+  #RewriteBase /
+
+  # we skip all files with .something
+  RewriteCond %{REQUEST_URI} \..+$             (1)
+  RewriteCond %{REQUEST_URI} !\.html$          (2)
+  RewriteRule .* - [L]
+
+  # we check if the .html version is here (caching)
+  RewriteRule ^$ index.html [QSA]
+  RewriteRule ^([^.]+)$ $1.html [QSA]
+  RewriteCond %{REQUEST_FILENAME} !-f
+
+  # no, so we redirect to our front web controller
+  RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+△●●●●
+
+

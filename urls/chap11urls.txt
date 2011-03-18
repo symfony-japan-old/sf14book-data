@@ -1,0 +1,44 @@
+第11章のURL
+===============================================================================
+
+★P367
+subversion によるバージョン管理
+http://svnbook.red-bean.com
+
+
+★P370
+Git入門
+http://www8.atwiki.jp/git_jp/
+
+
+★P373
+テスト駆動開発
+http://ja.wikipedia.org/wiki/テスト駆動開発
+
+
+★P374
+リファクタリング
+http://ja.wikipedia.org/wiki/リファクタリング_(プログラミング)
+
+
+★P389
+Capistrano
+https://github.com/capistrano/capistrano/wiki
+
+Capifony
+http://rubygems.org/gems/capifony
+
+Ruby	http://www.ruby-lang.org/ja/
+
+Ruby Gems	http://www.ruby-lang.org/ja/man/html/RubyGems.html
+
+
+★P391
+Cpifony README和訳
+https://github.com/everzet/capifony/blob/master/README.ja.md
+
+
+★P392
+Xdebug	http://www.xdebug.org/
+PECL Xdebug	http://pecl.php.net/package/Xdebug
+

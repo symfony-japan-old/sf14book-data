@@ -1,0 +1,267 @@
+第1章のリスト
+===============================================================================
+
+★［リスト1-1］――サンプルのYAML★
+▽●●●●
+config:
+  username:   sample
+  email:      info@symfony.gr.jp
+  accounts:
+    twitter:  symfony-japan
+    youtube:  ~
+flags:
+  - 初級
+  - 中級
+  - 上級
+△●●●●
+
+
+★［リスト1-2］――サンプルのYAMLを読み込んだvar_dump()の結果★
+▽●●●●
+array(2) {
+  ["config"]=>
+  array(3) {
+    ["username"]=>
+    string(6) "sample"
+    ["email"]=>
+    string(18) "info@symfony.gr.jp"
+    ["accounts"]=>
+    array(2) {
+      ["twitter"]=>
+      string(13) "symfony-japan"
+      ["youtube"]=>
+      NULL
+    }
+  }
+  ["flags"]=>
+  array(3) {
+    [0]=>
+    string(6) "初級"
+    [1]=>
+    string(6) "中級"
+    [2]=>
+    string(6) "上級"
+  }
+}
+△●●●●
+
+
+★［リスト1-3］――sfFormでのフォームクラスの例★
+▽●●●●
+class InquiryForm extends BaseForm
+{
+  public function configure()
+  {
+    $this->setWidgets(array(
+      'name'   => new sfWidgetFormInput(),
+      'email'  => new sfWidgetFormInput(),
+      )),
+    ));
+    $this->setValidators(array(
+      'name'   => new sfValidatorString(),
+      'email'  => new sfValidatorEmail(),
+    ));
+    $this->widgetSchema->setNameFormat('inquiry[%s]');
+  }
+}
+△●●●●
+
+
+★［リスト1-4］★
+▽●●●●
+if (2 === $space)
+{
+  while ($count < 10)
+  {
+    echo $count;
+△●●●●
+
+
+★［リスト1-5］★
+▽●●●●
+for ($count = 0; $count < 10; ++$count)
+{
+  $display = sprintf('%s', $count);
+△●●●●
+
+
+★［リスト1-6］★
+▽●●●●
+class User
+{
+  private $firstName = '';
+
+  public function getFirstName($firstNameOption)
+  {
+△●●●●
+
+
+★［リスト1-7］★
+▽●●●●
+/**
+ * プロジェクト用のリンクヘルパー
+ */
+function link_for_my_route($text, $route)
+{
+△●●●●
+
+
+★［リスト1-8］★
+▽●●●●
+class Helper
+{
+  public function getParameters()
+  {
+    $params = array(
+      'param_one' => 'test',
+    );
+
+    return $params;
+  }
+  public function renderImageTag()
+  {
+    $options = array(
+      'src_path' => $src,
+    );
+
+    return $this->render('img', $options)
+△●●●●
+
+
+★［リスト1-9］★
+▽●●●●
+class User
+{
+  public function getFirstName()
+  {
+    if (2 === $space)
+    {
+△●●●●
+
+
+★［リスト1-10］★
+▽●●●●
+class User
+{
+  static protected
+    $instance  = null,
+    $isCreated = false;        // 同じアクセス修飾子のプロパティーをまとめる
+
+  private
+    $isDirty   = false;
+
+  public function getFirstName()
+  {
+△●●●●
+
+
+★［リスト1-11］★
+▽●●●●
+class User
+{
+  public function getFirstName()
+  {
+    if (null === $this->firstName)
+    {
+      $this->firstName = '';
+    }
+
+    return $this->firstName;
+  }
+△●●●●
+
+
+★［リスト1-12］★
+▽●●●●
+$value = "$nameさんこんにちは";                 // これは変数展開なので×
+$value = $name.'さんこんにちは';                // 文字列結合は○
+$value = sprintf('%sさんこんにちは', $name);    // sprintf()の使用は○
+△●●●●
+
+
+★［リスト1-13］★
+▽●●●●
+$value = $name . 'さんこんにちは';              // 結合演算子の前後にスペースがあるので×
+$value = $name.'さんこんにちは';                // スペースをあけない○
+△●●●●
+
+
+★［リスト1-14］★
+▽●●●●
+$value = $name
+    .'さんこんにちは。前回のログインは'
+    .sprintf('%s', $lastLogin)
+    .'です。';
+△●●●●
+
+
+★［リスト1-15］★
+▽●●●●
+if (is_null($result))          // ×
+if ($result === null)          // ×
+if (null === $result)          // ○
+if (null !== $result)          // ○
+△●●●●
+
+
+★［リスト1-16］★
+▽●●●●
+if ($result === 'OK')          // ×
+if ('OK' === $result)          // ○
+if ('OK' !== $result)          // ○
+△●●●●
+
+
+★［リスト1-17］★
+▽●●●●
+class Member
+{
+  public function setAddress(Address $address)
+  {
+△●●●●
+
+
+★［リスト1-18］★
+▽●●●●
+/**
+ * メンバー情報を扱うクラス
+ */
+class Member
+{
+  /**
+   * メンバーの住所をAddressオブジェクトで設定する。
+   *
+   * @param  Address $address
+   * @return bool
+   */
+  public function setAddress(Address $address)
+  {
+△●●●●
+
+
+★［リスト1-19］★
+▽●●●●
+<html>
+  <body>
+    <?php if ($form->hasErrors()): ?>
+      <ul>
+        <?php foreach ($form->getErrors() as $error): ?>
+          <li>
+            <?php echo $error->getMessage() ?>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+  </body>
+</html>
+△●●●●
+
+
+★［リスト1-20］――ルーティング設定の例★
+▽●●●●
+category_show:
+  url:   /category/:name_slug
+  param: { module: Category, action: ContentShow }
+△●●●●
+
+

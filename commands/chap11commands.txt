@@ -1,0 +1,188 @@
+第11章のコマンド
+===============================================================================
+
+★P367
+svnadmin create /var/repos/test
+
+
+svn mkdir -m 'created initial directories' \
+file:///var/repos/test/trunk \
+file:///var/repos/test/tags \
+file:///var/repos/test/branches
+
+
+cd /var/www
+svn checkout file:///var/repos/test/trunk test
+
+
+cd test
+mkdir -p lib/vendor
+svn add *
+svn commit -m 'added lib/vendor'
+
+
+★P368
+svn propedit svn:externals lib/vendor
+
+svn update
+
+svn commit -m 'added symfony libs to externals'
+
+
+php lib/vendor/symfony/data/bin/symfony generate:project test
+svn add apps cache config data lib/* log plugins test web symfony
+svn commit -m 'generated initial project files'
+
+
+★P369
+svn propedit svn:ignore cache
+
+
+svn propedit svn:ignore log
+
+
+svn commit -m 'set svn:ignore for cache and log directory'
+
+
+cd /var/www
+$ svn checkout file:///var/repos/test/trunk test2
+
+
+cd test2
+php symfony project:permissions
+
+
+P370
+mkdir /var/www/test
+cd /var/www/test
+git init
+
+
+git submodule init
+git submodule add git://github.com/vjousse/symfony-1.4.git lib/vendor/symfony
+
+
+★P371
+git add .
+git commit -m 'added symfony library to submodule'
+
+
+git add .gitignore
+git commit -m 'added exclude directories'
+
+
+php lib/vendor/symfony/data/bin/symfony generate:project test
+
+
+git add .
+git commit -m 'initial project files'
+
+
+cd /var/www
+git clone test test2
+
+
+cd test2
+git submodule init
+git submodule update
+mkdir cache log
+php symfony project:permissions
+
+
+★P375
+php symfony doctrine:build-db --env=test
+php symfony doctrine:insert-sql --env=test
+
+
+★P377
+php symfony test:unit Page
+
+
+★P379
+php symfony test:unit Page
+
+
+★P380
+php symfony doctrine:build --all
+php symfony doctrine:build --all --env=test
+
+
+php symfony test:unit Page
+
+
+★P381
+php symfony test:functional frontend PageActions
+
+
+★P382
+php symfony test:functional frontend PageActions
+
+
+★P383
+php symfony test:functional frontend PageActions
+
+
+★P384
+php symfony test:functional frontend PageActions
+
+
+php symfony doctrine:build --all --and-load
+
+
+★P387
+php symfony project:deploy production --go -t
+
+
+php symfony project:deploy production -t
+
+
+★P388
+svn checkout http://example.com/repository/release application
+
+
+svn update
+
+
+git clone git://github.com/repository/appication.git
+
+
+git submodule init
+git submodule update
+
+
+git pull
+
+
+git fetch origin
+git checkout v1.0.0
+
+
+★P389
+ruby --version
+gem --version
+
+
+sudo gem install capifony
+
+
+gem list
+
+
+★P390
+capifony .
+
+
+★P391
+cap deploy:setup
+
+
+cap deploy:cold
+
+
+★P392
+php symfony test:coverage テストファイル テスト対象クラスファイル
+
+
+php symfony test:coverage --detailed テストファイル テスト対象クラスファイル
+
+

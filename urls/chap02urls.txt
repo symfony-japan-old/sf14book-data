@@ -1,0 +1,53 @@
+第2章のURL
+===============================================================================
+
+★P54
+Apache HTTP Server	http://httpd.apache.org/
+Apacheのドキュメント	http://httpd.apache.org/docs/2.2/
+MySQL	http://www-jp.mysql.com/
+
+
+★P57
+http://www.symfony-project.org/installation/1_4
+
+
+★P67
+XAMPP 1.7.3のダウンロードページ
+http://sourceforge.net/projects/xampp/files/XAMPP%20Windows/1.7.3/xampp-win32-1.7.3.exe/download
+
+
+★P70
+動作環境確認用スクリプトのダウンロードURL
+http://sf-to.org/1.4/check.php
+
+
+★P72
+TortoiseSVN プロジェクト日本語トップページ - SourceForge.JP
+http://sourceforge.jp/projects/tortoisesvn/
+
+
+★P76
+MAMPダウンロードページ
+http://www.mamp.info/en/downloads/index.html
+
+
+★P79
+動作環境確認用スクリプトのダウンロードURL
+http://sf-to.org/1.4/check.php
+
+
+★P84
+vjousse 氏によるsymfony 1.4のGitリポジトリ
+http://github.com/vjousse/symfony-1.4
+
+
+★P85
+NetBeans IDE Download
+http://netbeans.org/downloads/index.html?pagelang=ja
+
+
+★P92
+https://github.com/soh335/vim-symfony
+https://github.com/soh335/vim-symfony/blob/master/doc/symfony.jax
+http://www.symfony-project.org/more-with-symfony/1_4/ja/03-Enhance-your-Productivity#chapter_03_sub_ide
+

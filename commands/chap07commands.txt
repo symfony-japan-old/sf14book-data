@@ -1,0 +1,16 @@
+第7章のコマンド
+===============================================================================
+
+★P271
+php symfony generate:task hello
+
+
+★P275
+php symfony generate:task getFeed
+
+
+★P276
+php symfony getFeed
+
+
+
