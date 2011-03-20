@@ -23,6 +23,9 @@ test:
       dsn:      mysql:host=localhost;dbname=symfonybandtest
       username: root
       password:
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_unicode_ci
 all:
   doctrine:
     class: sfDoctrineDatabase
@@ -30,6 +33,9 @@ all:
       dsn:      mysql:host=localhost;dbname=symfonyband
       username: root
       password:
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_unicode_ci
 △●●●●
 
 
