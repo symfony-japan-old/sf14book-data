@@ -770,7 +770,7 @@ inquiry_complete:
 △●●●●
 
 
-★［リスト4-51］――InquryFormクラスのconfigure()メソッドでウィジェットのHTML属性とオプションを指定★
+★［リスト4-51］――InquiryFormクラスのconfigure()メソッドでウィジェットのHTML属性とオプションを指定★
 ▽●●●●
     $this->setWidgets(array(
       'name'   => new sfWidgetFormInput(array(
